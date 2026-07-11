@@ -75,7 +75,9 @@ export async function verifyToken(
 export function verifyPassword(candidate: string): boolean {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) return false;
-  return safeEqual(candidate, password);
+  // Normalise so an accented character (é) typed as a combining sequence still
+  // matches the stored precomposed form.
+  return safeEqual(candidate.normalize("NFC"), password.normalize("NFC"));
 }
 
 /** True if the current request carries a valid admin session. */
