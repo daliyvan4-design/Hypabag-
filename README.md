@@ -116,12 +116,13 @@ place dans un site réel :
 
 ## À finir
 
-- **Les vidéos héros / transition sont à téléverser.** Elles n'existaient nulle
-  part au départ (l'API du projet Claude Design tronque les binaires à 192 Kio,
-  atome `moov` manquant). Il n'y a plus rien à coder : allez dans **/admin →
-  Média & vidéos**, téléversez vos fichiers, ils passent sur Cloudinary et
-  s'activent immédiatement. Sans vidéo, le héros garde son image d'affiche et le
-  rideau son monogramme animé.
+- **Vidéo de transition** : `public/assets/loading.mp4` (le logo HYPA en
+  rotation 3D) est en place, téléversée sur Cloudinary (`hypa/loading`) et servie
+  en `q_auto`. C'est le loader par défaut entre les pages
+  ([lib/media.ts](lib/media.ts), `LOADER_VIDEO_DEFAULT`).
+- **Vidéo héros** (fond d'accueil) : optionnelle, à téléverser via **/admin →
+  Média & vidéos** si souhaité ; sans elle, le héros garde son image d'affiche.
+  Toute vidéo téléversée depuis le backoffice remplace le défaut.
 - **Le paiement n'est pas encaissé.** `/api/orders` enregistre la commande et
   envoie les emails, mais aucun processeur (Stripe…) n'est branché : les champs
   de carte ne sont lus par personne. À câbler avant toute vente réelle.
