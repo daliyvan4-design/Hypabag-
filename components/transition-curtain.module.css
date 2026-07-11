@@ -1,0 +1,75 @@
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ecru);
+  /* Contain the wordmark's multiply blend to the ecru screen; without this it
+     composites against the browser's white canvas and the logo's white
+     background shows as a stark square. */
+  isolation: isolate;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video {
+  width: min(46%, 460px);
+  height: auto;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Stand-in for loading.mp4: the wordmark, at the video's size and blend,
+   breathing softly. */
+.wordmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(46%, 460px);
+  /* The blend lives here, not on the img: this element's transform (from the
+     breath animation) forms the blend group that composites against the ecru.
+     `darken` keys out the logo's near-white background cleanly (min per channel
+     clamps it to the ecru) while leaving the bordeaux wordmark untouched. */
+  mix-blend-mode: darken;
+  animation: curtainBreath 2.1s ease-in-out infinite;
+}
+
+.wordmark img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@keyframes curtainBreath {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.985);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 860px) {
+  .video,
+  .wordmark {
+    width: 64%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark {
+    animation: none;
+    opacity: 1;
+  }
+}

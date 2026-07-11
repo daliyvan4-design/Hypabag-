@@ -1,0 +1,286 @@
+.page {
+  animation: hypaFade 0.9s ease both;
+}
+
+.shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--bordeaux);
+  opacity: 0.7;
+  margin-bottom: 18px;
+}
+
+.pageHead {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 110px var(--gutter) 60px;
+}
+
+.pageTitle {
+  font-family: var(--font-serif), serif;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.lead {
+  font-size: 16px;
+  line-height: 1.75;
+  font-weight: 300;
+  opacity: 0.7;
+  margin-top: 22px;
+  max-width: 560px;
+}
+
+/* Controls ---------------------------------------------------------------- */
+
+.cta {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--ecru);
+  background: var(--bordeaux);
+  padding: 15px 28px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  transition:
+    background 0.4s ease,
+    transform 0.4s ease;
+}
+
+.cta:hover {
+  background: var(--bordeaux-deep);
+  transform: translateY(-2px);
+}
+
+.ctaWide {
+  composes: cta;
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  padding: 18px 0;
+  margin-top: 36px;
+}
+
+.ghost {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--bordeaux);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ghostCentered {
+  composes: ghost;
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 14px 0 0;
+}
+
+.input {
+  flex: 1;
+  min-width: 120px;
+  background: var(--ivoire);
+  border: 1px solid rgba(42, 35, 32, 0.14);
+  border-radius: 12px;
+  padding: 13px 16px;
+  color: var(--encre);
+  font-family: inherit;
+  font-size: 13.5px;
+  outline-offset: 0;
+}
+
+.formTitle {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--bordeaux);
+  opacity: 0.8;
+  margin: 18px 0 6px;
+  text-transform: uppercase;
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+}
+
+/* Totals ------------------------------------------------------------------ */
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  opacity: 0.7;
+  padding: 10px 0;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-serif), serif;
+  font-size: 20px;
+  color: var(--bordeaux);
+  padding: 16px 0 0;
+  border-top: 1px solid var(--rule);
+  margin-top: 6px;
+}
+
+.note {
+  font-size: 11.5px;
+  opacity: 0.45;
+  margin-top: 18px;
+  text-align: center;
+}
+
+/* Quantity ---------------------------------------------------------------- */
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qtyBtn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--encre);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qtyValue {
+  font-size: 13px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Checkout steps ---------------------------------------------------------- */
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 34px;
+  flex-wrap: wrap;
+}
+
+.step {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.35;
+}
+
+.stepActive {
+  composes: step;
+  color: var(--bordeaux);
+  opacity: 1;
+}
+
+.stepDone {
+  composes: step;
+  color: var(--bordeaux);
+  opacity: 0.6;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.stepRule {
+  width: 36px;
+  height: 1px;
+  background: rgba(42, 35, 32, 0.2);
+}
+
+/* Empty cart -------------------------------------------------------------- */
+
+.emptyState {
+  margin-top: 50px;
+  padding: 60px 0;
+  text-align: center;
+  border-top: 1px solid var(--rule);
+}
+
+.emptyTitle {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--bordeaux);
+  margin: 0 0 8px;
+}
+
+.emptyText {
+  font-size: 13px;
+  opacity: 0.6;
+  margin: 0 0 26px;
+}
+
+/* Striped placeholder ----------------------------------------------------- */
+
+.striped {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--sable) 0px,
+    var(--sable) 14px,
+    var(--sable-shade) 14px,
+    var(--sable-shade) 15px
+  );
+}
+
+.stripedRose {
+  composes: striped;
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--rose) 0px,
+    var(--rose) 14px,
+    var(--rose-shade) 14px,
+    var(--rose-shade) 15px
+  );
+}
+
+@media (max-width: 860px) {
+  .pageHead {
+    padding: 70px var(--gutter) 40px;
+  }
+  .pageTitle {
+    font-size: 36px;
+  }
+  .lead {
+    font-size: 14px;
+  }
+  .qty {
+    gap: 8px;
+  }
+  .formRow {
+    flex-wrap: wrap;
+  }
+  .input {
+    min-width: 100%;
+  }
+  .emptyState {
+    padding: 40px 0;
+  }
+}

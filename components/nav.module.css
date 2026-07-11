@@ -1,0 +1,215 @@
+.nav {
+  position: sticky;
+  top: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: calc(100% - 48px);
+  margin: 16px auto;
+  padding: 8px;
+  background: var(--bordeaux);
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgba(99, 36, 52, 0.2);
+  transition:
+    padding 0.55s var(--ease),
+    box-shadow 0.55s ease;
+}
+
+.logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--ecru);
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mark img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Tap-to-expand affordance, phones only. */
+.hint {
+  position: absolute;
+  bottom: -2px;
+  right: -3px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ecru);
+  border: 2px solid var(--bordeaux);
+  animation: hypaHint 1.8s ease-in-out infinite;
+}
+
+.collapse {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  margin-left: 0;
+  transition:
+    max-width 0.6s var(--ease),
+    opacity 0.4s ease,
+    margin-left 0.6s var(--ease);
+}
+
+.links {
+  display: flex;
+  gap: 6px;
+}
+
+.link {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ecru);
+  opacity: 0.72;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 7px 15px;
+  border-radius: 20px;
+  white-space: nowrap;
+  transition: all 0.4s ease;
+}
+
+.link:hover {
+  opacity: 1;
+  background: rgba(244, 238, 228, 0.14);
+}
+
+.linkActive {
+  opacity: 1;
+  color: var(--bordeaux);
+  background: var(--ecru);
+}
+
+.linkActive:hover {
+  background: var(--ecru);
+}
+
+.cartBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.cartBtn:hover {
+  background: rgba(244, 238, 228, 0.14);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--ecru);
+  color: var(--bordeaux);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Expanded: pointer hover on desktop, keyboard focus everywhere. */
+.nav:focus-within,
+.nav[data-open="true"] {
+  padding: 11px 20px 11px 16px;
+  box-shadow: 0 18px 40px rgba(99, 36, 52, 0.28);
+}
+
+.nav:focus-within .collapse,
+.nav[data-open="true"] .collapse {
+  max-width: 720px;
+  opacity: 1;
+  margin-left: 18px;
+}
+
+@media (hover: hover) and (min-width: 861px) {
+  .nav:hover {
+    padding: 11px 20px 11px 16px;
+    box-shadow: 0 18px 40px rgba(99, 36, 52, 0.28);
+  }
+
+  .nav:hover .collapse {
+    max-width: 720px;
+    opacity: 1;
+    margin-left: 18px;
+  }
+}
+
+@media (max-width: 860px) {
+  .nav {
+    top: 12px;
+    max-width: calc(100% - 24px);
+    margin: 12px auto;
+  }
+
+  .nav[data-open="false"] .mark {
+    animation: hypaRing 2.4s ease-out infinite;
+  }
+
+  .nav[data-open="false"] .hint {
+    display: flex;
+  }
+
+  .nav:focus-within,
+  .nav[data-open="true"] {
+    padding: 8px 12px 8px 9px;
+  }
+
+  .nav:focus-within .collapse,
+  .nav[data-open="true"] .collapse {
+    max-width: 320px;
+    margin-left: 5px;
+  }
+
+  .collapse {
+    gap: 4px;
+  }
+
+  .links {
+    gap: 2px;
+  }
+
+  .link {
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    padding: 6px;
+  }
+}

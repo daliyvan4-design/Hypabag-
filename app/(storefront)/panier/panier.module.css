@@ -1,0 +1,76 @@
+.page {
+  padding: 90px var(--gutter) 150px;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.list {
+  margin-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.thumb {
+  position: relative;
+  width: 72px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rowBody {
+  flex: 1;
+}
+
+.nom {
+  font-family: var(--font-serif), serif;
+  font-size: 19px;
+}
+
+.matiere {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 3px;
+}
+
+.lineTotal {
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  color: var(--bordeaux);
+  min-width: 84px;
+  text-align: right;
+}
+
+.summary {
+  margin-top: 8px;
+}
+
+/* Reserves the fold so the page doesn't jump when the cart hydrates. */
+.placeholder {
+  min-height: 320px;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 60px var(--gutter) 100px;
+  }
+
+  .row {
+    gap: 14px;
+    padding: 18px 0;
+  }
+
+  .thumb {
+    width: 56px;
+  }
+}

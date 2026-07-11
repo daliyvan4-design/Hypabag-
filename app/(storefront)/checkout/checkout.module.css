@@ -1,0 +1,90 @@
+.page {
+  padding: 90px var(--gutter) 150px;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 64px;
+  margin-top: 40px;
+  align-items: start;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recap {
+  background: var(--creme);
+  border-radius: 18px;
+  padding: 30px 28px;
+  position: sticky;
+  top: 96px;
+}
+
+.recapRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(42, 35, 32, 0.1);
+}
+
+.recapThumb {
+  position: relative;
+  width: 48px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.recapBody {
+  flex: 1;
+}
+
+.recapNom {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+}
+
+.recapQte {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: 2px;
+}
+
+.recapPrix {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--bordeaux);
+}
+
+.recapDivider {
+  height: 1px;
+  background: rgba(42, 35, 32, 0.14);
+  margin: 16px 0 6px;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 60px 20px 90px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .recap {
+    position: static;
+    padding: 24px 22px;
+  }
+}

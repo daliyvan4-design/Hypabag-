@@ -1,0 +1,132 @@
+# HYPA
+
+Boutique en ligne d'une maison de maroquinerie artisanale. Porté depuis la
+maquette Claude Design `HYPA.dc.html` vers Next.js (App Router, TypeScript,
+CSS Modules).
+
+```bash
+pnpm install
+cp .env.example .env.local   # renseigner Cloudinary + Resend
+pnpm dev
+```
+
+## Configuration (`.env.local`)
+
+| Variable                             | Rôle                                                     |
+| ------------------------------------ | -------------------------------------------------------- |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`  | Vide = images servies depuis `public/assets`. Renseigné = via Cloudinary (assets déjà téléversés). |
+| `CLOUDINARY_API_KEY` / `_API_SECRET` | Requis uniquement pour `pnpm media:upload`.              |
+| `RESEND_API_KEY`                     | Sans elle, les formulaires répondent 503.               |
+| `RESEND_FROM`                        | Expéditeur. `onboarding@resend.dev` = mode bac à sable.  |
+| `RESEND_SHOP_EMAIL`                  | Destinataire des alertes commande / inscription.        |
+| `ADMIN_PASSWORD`                     | Mot de passe du backoffice `/admin`.                    |
+| `ADMIN_SESSION_SECRET`               | Secret de signature des sessions admin (chaîne aléatoire longue). |
+
+**Mode bac à sable :** tant que `RESEND_FROM` reste `onboarding@resend.dev`,
+Resend ne délivre qu'à `RESEND_SHOP_EMAIL`. Le client ne reçoit donc rien, et le
+site le dit — la page de confirmation adapte son texte (`lastOrder.emailed`).
+Basculer sur `bonjour@votredomaine.fr` une fois le domaine vérifié.
+
+## Backoffice (`/admin`)
+
+Espace de gestion protégé par mot de passe (`ADMIN_PASSWORD`), session signée en
+cookie HttpOnly. Trois espaces :
+
+- **Tableau de bord** — CA, commandes, inscrits, pièces ; graphique du CA par
+  jour avec sélecteur de période (7 j / 30 j / tout).
+- **Produits** — création, édition, suppression des pièces (avec upload de photo
+  vers Cloudinary). Toute modification se reflète immédiatement sur le site.
+- **Média & vidéos** — upload des vidéos héros et de transition vers Cloudinary,
+  actives sur le site dès l'envoi ; « Retirer » revient au fallback (image
+  d'affiche / monogramme).
+- **Commandes** — historique complet des commandes et des inscrits.
+
+## Persistance
+
+Les données (produits, commandes, inscrits, réglages) sont stockées en JSON sous
+`data/` via [lib/store.ts](lib/store.ts) — le **seul** module qui connaît
+l'emplacement des données. Les produits sont initialisés depuis `seedPieces`
+([lib/pieces.ts](lib/pieces.ts)) au premier accès.
+
+> Ce store fichier convient à `next dev`/`next start` et à une instance unique.
+> Il **ne convient pas** à un déploiement serverless multi-instances (système de
+> fichiers en lecture seule / non partagé) : migrer vers une vraie base
+> (Neon Postgres, Upstash Redis) en ne remplaçant que `lib/store.ts`. Le dossier
+> `data/` est gitignoré (il contient des données clients).
+
+## Médias
+
+Les images passent par un loader `next/image` custom
+([lib/cloudinary-loader.ts](lib/cloudinary-loader.ts)) : `f_auto,q_auto` négocie
+WebP/AVIF au vol, aussi bien pour les assets seed (`/assets/*`) que pour les
+photos produit téléversées depuis le backoffice. `pnpm media:upload` pousse les
+images de `public/assets` vers Cloudinary (dossier `hypa/`). Les vidéos héros et
+de transition sont téléversées depuis le backoffice et référencées dans
+`data/site.json`.
+
+## Structure
+
+| Route                | Page                                              |
+| -------------------- | ------------------------------------------------- |
+| `/`                  | Accueil — héros, manifeste, trois portes d'entrée  |
+| `/collection`        | Les sept pièces, accrochées en quinconce           |
+| `/collection/[slug]` | Fiche pièce                                        |
+| `/atelier`           | Le récit du fait main                              |
+| `/panier`            | Panier                                             |
+| `/checkout`          | Coordonnées, livraison, paiement                   |
+| `/confirmation`      | Commande confirmée                                 |
+
+- `lib/products.ts` — lecture/écriture du catalogue (store fichier, initialisé
+  depuis `lib/pieces.ts`). **Les prix ne viennent que d'ici :** `/api/orders`
+  recalcule chaque total à partir du slug, jamais depuis le corps de la requête,
+  pour qu'un client ne puisse pas se faire confirmer une commande à un faux prix.
+- `lib/cart.tsx` — panier hors React (`useSyncExternalStore`), persisté dans
+  `localStorage`, lu de façon synchrone au premier rendu client.
+- `lib/email.ts` — envoi Resend + gabarits HTML. `RESEND_ENDPOINT` est
+  surchargeable pour tester sans expédier.
+- `lib/rate-limit.ts` — garde-fou mémoire (5 req / 10 min) sur les deux routes
+  qui déclenchent un envoi. À remplacer par un store partagé (Upstash/KV) avant
+  du vrai trafic.
+- `app/api/orders`, `app/api/newsletter` — routes serveur.
+- `components/ui.module.css` — les briques partagées (boutons, totaux, étapes).
+- `components/transition-curtain.tsx` — le rideau de marque entre les pages.
+
+## Écarts assumés par rapport à la maquette
+
+La maquette est une démo interactive ; certaines de ses béquilles n'ont pas leur
+place dans un site réel :
+
+- **Le bouton « Mobile / Bureau » et le cadre de téléphone** ont disparu au
+  profit de vraies media queries (point de bascule : 860 px).
+- **Le panier démarre vide.** La maquette le pré-remplissait de deux pièces.
+- **Le panneau plein écran** (`menuOverlay`) et l'observateur `[data-reveal]`
+  n'étaient reliés à aucun déclencheur : non portés.
+- **Chaque page a sa propre URL** au lieu d'un `state.page`, et la fiche `Nour`
+  est devenue `/collection/[slug]`, servie pour les sept pièces.
+- **Le rideau de transition** ne s'affiche pas sur `/panier`, `/checkout` et
+  `/confirmation`, et jamais si `prefers-reduced-motion` est actif. Ses durées
+  sont deux constantes en tête de `components/transition-curtain.tsx`.
+
+## À finir
+
+- **Les vidéos héros / transition sont à téléverser.** Elles n'existaient nulle
+  part au départ (l'API du projet Claude Design tronque les binaires à 192 Kio,
+  atome `moov` manquant). Il n'y a plus rien à coder : allez dans **/admin →
+  Média & vidéos**, téléversez vos fichiers, ils passent sur Cloudinary et
+  s'activent immédiatement. Sans vidéo, le héros garde son image d'affiche et le
+  rideau son monogramme animé.
+- **Base de données pour la production.** Le store JSON (`data/`) convient au
+  développement et à une instance unique, pas au serverless multi-instances.
+  Migrer vers Neon/Upstash en remplaçant `lib/store.ts` (voir « Persistance »).
+- **Le paiement n'est pas encaissé.** `/api/orders` enregistre la commande et
+  envoie les emails, mais aucun processeur (Stripe…) n'est branché : les champs
+  de carte ne sont lus par personne. À câbler avant toute vente réelle.
+- **Domaine email à vérifier.** Tant que `RESEND_FROM` reste le bac à sable, les
+  clients ne reçoivent pas leur confirmation (seul `RESEND_SHOP_EMAIL` est
+  servi). Acheter + vérifier un domaine chez Resend, puis changer `RESEND_FROM`.
+- **Faire tourner les secrets** ayant transité par la mise en place
+  (clés Cloudinary et Resend).
+- **Six pièces sur sept n'ont pas de spécifications.** Elles ont désormais leur
+  prose descriptive, mais dimensions / matières / délais restent vides : ce sont
+  des affirmations commerciales, à remplir dans `lib/pieces.ts` par l'atelier.
+- **Les bandes rayées** tiennent lieu de photographies produit.

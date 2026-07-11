@@ -1,0 +1,98 @@
+.periods {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--ivoire);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.period {
+  border: none;
+  background: transparent;
+  color: var(--encre);
+  opacity: 0.6;
+  font-size: 12.5px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.period:hover {
+  opacity: 1;
+}
+
+.periodActive {
+  composes: period;
+  background: var(--bordeaux);
+  color: var(--ecru);
+  opacity: 1;
+}
+
+.chartPanel {
+  background: var(--ivoire);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 24px 24px 16px;
+  margin-bottom: 28px;
+}
+
+.chartHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chartTitle {
+  font-family: var(--font-serif), serif;
+  font-size: 20px;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 160px;
+}
+
+.bar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.barFill {
+  width: 100%;
+  max-width: 34px;
+  background: linear-gradient(180deg, var(--bordeaux), #8a3648);
+  border-radius: 6px 6px 0 0;
+  min-height: 2px;
+  transition: height 0.4s var(--ease);
+}
+
+.barFillEmpty {
+  composes: barFill;
+  background: rgba(42, 35, 32, 0.08);
+}
+
+.barLabel {
+  font-size: 9.5px;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+.chartEmpty {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  font-size: 13.5px;
+}
