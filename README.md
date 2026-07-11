@@ -43,16 +43,23 @@ cookie HttpOnly. Trois espaces :
 
 ## Persistance
 
-Les données (produits, commandes, inscrits, réglages) sont stockées en JSON sous
-`data/` via [lib/store.ts](lib/store.ts) — le **seul** module qui connaît
-l'emplacement des données. Les produits sont initialisés depuis `seedPieces`
-([lib/pieces.ts](lib/pieces.ts)) au premier accès.
+Toutes les données (produits, commandes, inscrits, réglages) passent par
+[lib/store.ts](lib/store.ts) — le **seul** module qui connaît l'emplacement des
+données. Il stocke chaque « collection » comme un document et choisit son
+backend automatiquement :
 
-> Ce store fichier convient à `next dev`/`next start` et à une instance unique.
-> Il **ne convient pas** à un déploiement serverless multi-instances (système de
-> fichiers en lecture seule / non partagé) : migrer vers une vraie base
-> (Neon Postgres, Upstash Redis) en ne remplaçant que `lib/store.ts`. Le dossier
-> `data/` est gitignoré (il contient des données clients).
+- **Postgres** dès qu'une chaîne de connexion est présente (`POSTGRES_URL` ou
+  `DATABASE_URL`) — c'est le cas en production. Une table JSONB `store(key, value)`,
+  mutations sous verrou de ligne (`SELECT … FOR UPDATE`) pour rester correct en
+  multi-instances. Backend : [lib/store-postgres.ts](lib/store-postgres.ts),
+  pool : [lib/db.ts](lib/db.ts).
+- **Fichiers JSON** sous `data/` sinon — pour le développement local, sans base à
+  installer. Backend : [lib/store-file.ts](lib/store-file.ts).
+
+Les produits sont initialisés depuis `seedPieces`
+([lib/pieces.ts](lib/pieces.ts)) au premier accès. En production, la base Neon
+est provisionnée via le Vercel Marketplace (intégration Neon), qui injecte
+`POSTGRES_URL` dans le projet. Le dossier `data/` est gitignoré.
 
 ## Médias
 
@@ -115,9 +122,6 @@ place dans un site réel :
   Média & vidéos**, téléversez vos fichiers, ils passent sur Cloudinary et
   s'activent immédiatement. Sans vidéo, le héros garde son image d'affiche et le
   rideau son monogramme animé.
-- **Base de données pour la production.** Le store JSON (`data/`) convient au
-  développement et à une instance unique, pas au serverless multi-instances.
-  Migrer vers Neon/Upstash en remplaçant `lib/store.ts` (voir « Persistance »).
 - **Le paiement n'est pas encaissé.** `/api/orders` enregistre la commande et
   envoie les emails, mais aucun processeur (Stripe…) n'est branché : les champs
   de carte ne sont lus par personne. À câbler avant toute vente réelle.
