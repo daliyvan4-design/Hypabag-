@@ -73,7 +73,8 @@ Passerelle ivoirienne [pay.genius.ci](https://pay.genius.ci/doc), débit en XOF.
 - Un **pop-up newsletter** s'affiche sur l'accueil au bout de 10 s, deux fois au
   plus (compteur `localStorage`), jamais après inscription.
 - Le **garde-fou anti-abus** ([lib/rate-limit.ts](lib/rate-limit.ts)) est
-  adossé à Postgres (partagé entre instances) ; repli mémoire en local.
+  adossé à **Upstash Redis** (`@upstash/ratelimit`, fenêtre glissante, partagé
+  entre instances) ; repli mémoire en local.
 
 ## Persistance
 
