@@ -165,4 +165,7 @@ place dans un site réel :
   prose descriptive, mais dimensions / matières / délais restent vides : ce sont
   des affirmations commerciales, à remplir dans `lib/pieces.ts` par l'atelier.
 - **Les bandes rayées** tiennent lieu de photographies produit.
-- **Pages légales** (CGV, mentions légales, RGPD, livraison, retours) à écrire.
+- **Pages légales** (`/mentions-legales`, `/cgv`, `/confidentialite`,
+  `/livraison`, `/retours`) : en place, mais il reste à **compléter les champs
+  entre crochets** (raison sociale, RCCM/SIRET, adresse, email de contact,
+  frais/délais de livraison…) — surlignés en bordeaux sur chaque page.
