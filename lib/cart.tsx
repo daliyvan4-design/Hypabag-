@@ -4,7 +4,6 @@ import { useSyncExternalStore } from "react";
 import type { Piece } from "./pieces";
 
 const CART_KEY = "hypa_cart";
-const ORDER_KEY = "hypa_last_order";
 
 export type CartLine = {
   slug: string;
@@ -14,15 +13,8 @@ export type CartLine = {
   qte: number;
 };
 
-export type PlacedOrder = {
-  no: string;
-  /** Whether Resend actually delivered a confirmation to the customer. */
-  emailed: boolean;
-};
-
 type Snapshot = {
   lines: CartLine[];
-  lastOrder: PlacedOrder | null;
   drawerOpen: boolean;
 };
 
@@ -32,7 +24,7 @@ type Snapshot = {
  * agreement with the (cartless) server HTML; React swaps in the real snapshot
  * immediately afterwards.
  */
-const EMPTY: Snapshot = { lines: [], lastOrder: null, drawerOpen: false };
+const EMPTY: Snapshot = { lines: [], drawerOpen: false };
 
 let snapshot: Snapshot = EMPTY;
 const listeners = new Set<() => void>();
@@ -87,30 +79,8 @@ function persist(lines: CartLine[]) {
   }
 }
 
-function readOrder(): PlacedOrder | null {
-  try {
-    const raw = window.sessionStorage.getItem(ORDER_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : null;
-    if (typeof parsed !== "object" || parsed === null) return null;
-    const order = parsed as PlacedOrder;
-    if (typeof order.no !== "string") return null;
-    return { no: order.no, emailed: order.emailed === true };
-  } catch {
-    return null;
-  }
-}
-
-function persistOrder(order: PlacedOrder | null) {
-  try {
-    if (order) window.sessionStorage.setItem(ORDER_KEY, JSON.stringify(order));
-    else window.sessionStorage.removeItem(ORDER_KEY);
-  } catch {
-    // Non-fatal: the confirmation page redirects home when it finds no order.
-  }
-}
-
 if (typeof window !== "undefined") {
-  snapshot = { lines: readCart(), lastOrder: readOrder(), drawerOpen: false };
+  snapshot = { lines: readCart(), drawerOpen: false };
 }
 
 /* Actions ------------------------------------------------------------------ */
@@ -157,22 +127,10 @@ export function toggleDrawer() {
   commit({ drawerOpen: !snapshot.drawerOpen });
 }
 
-/** No payment processor is wired up: this only records the order locally. */
-export function placeOrder(): string {
-  const orderNo = `HY-${Math.floor(100000 + Math.random() * 899999)}`;
-  const order: PlacedOrder = { no: orderNo, emailed: false };
-  persistOrder(order);
+/** Emptied on the confirmation page once payment has gone through. */
+export function clear() {
   persist([]);
-  commit({ lines: [], lastOrder: order, drawerOpen: false });
-  return orderNo;
-}
-
-/** Called once /api/orders reports back, so the confirmation page tells the truth. */
-export function markOrderEmailed(emailed: boolean) {
-  if (!snapshot.lastOrder) return;
-  const order: PlacedOrder = { ...snapshot.lastOrder, emailed };
-  persistOrder(order);
-  commit({ lastOrder: order });
+  commit({ lines: [], drawerOpen: false });
 }
 
 /* Hooks -------------------------------------------------------------------- */
@@ -189,7 +147,6 @@ export function useCart() {
   return {
     hydrated,
     lines: snap.lines,
-    lastOrder: snap.lastOrder,
     drawerOpen: snap.drawerOpen,
     count: snap.lines.reduce((total, line) => total + line.qte, 0),
     subtotal: snap.lines.reduce(
@@ -201,7 +158,6 @@ export function useCart() {
     openDrawer,
     closeDrawer,
     toggleDrawer,
-    placeOrder,
-    markOrderEmailed,
+    clear,
   };
 }

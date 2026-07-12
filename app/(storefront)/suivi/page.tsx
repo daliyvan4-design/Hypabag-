@@ -5,7 +5,13 @@ import { Suspense, useState, type FormEvent } from "react";
 import ui from "@/components/ui.module.css";
 import styles from "./suivi.module.css";
 
-type OrderStatus = "en_preparation" | "expediee" | "livree" | "annulee";
+type OrderStatus =
+  | "en_attente_paiement"
+  | "paiement_echoue"
+  | "en_preparation"
+  | "expediee"
+  | "livree"
+  | "annulee";
 
 type LookupOrder = {
   orderNo: string;
@@ -15,12 +21,19 @@ type LookupOrder = {
   lines: { nom: string; qte: number }[];
 };
 
-// The three forward steps shown as a progress line. "annulee" is handled apart.
+// The three forward steps shown as a progress line. Payment/cancelled states
+// are handled apart.
 const STEPS: { key: OrderStatus; label: string }[] = [
   { key: "en_preparation", label: "En préparation" },
   { key: "expediee", label: "Expédiée" },
   { key: "livree", label: "Livrée" },
 ];
+
+const ASIDE: Partial<Record<OrderStatus, string>> = {
+  en_attente_paiement: "Paiement en attente. Votre commande sera confirmée dès réception du règlement.",
+  paiement_echoue: "Le paiement n'a pas abouti. Cette commande n'a pas été confirmée.",
+  annulee: "Cette commande a été annulée.",
+};
 
 function stepIndex(status: OrderStatus): number {
   return STEPS.findIndex((s) => s.key === status);
@@ -115,8 +128,8 @@ function Tracker() {
           <div className={styles.result}>
             <div className={styles.resultNo}>COMMANDE N° {order.orderNo}</div>
 
-            {order.status === "annulee" ? (
-              <p className={styles.cancelled}>Cette commande a été annulée.</p>
+            {ASIDE[order.status] ? (
+              <p className={styles.cancelled}>{ASIDE[order.status]}</p>
             ) : (
               <div className={styles.steps}>
                 {STEPS.map((step, i) => {

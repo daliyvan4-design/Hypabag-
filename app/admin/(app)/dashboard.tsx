@@ -34,7 +34,10 @@ export function Dashboard({
 
   const view = useMemo(() => {
     const cutoff = period.days === null ? 0 : now - period.days * 86_400_000;
-    const inWindow = orders.filter((o) => new Date(o.createdAt).getTime() >= cutoff);
+    // Only paid orders count as revenue; pending/failed payments don't.
+    const inWindow = orders.filter(
+      (o) => o.paid && new Date(o.createdAt).getTime() >= cutoff,
+    );
     const revenue = inWindow.reduce((sum, o) => sum + o.total, 0);
 
     // One bucket per day across the window (default 14 for "tout").

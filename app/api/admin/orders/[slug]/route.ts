@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/admin-auth";
-import { ORDER_STATUSES, updateOrder, type OrderStatus } from "@/lib/orders";
+import { MANUAL_STATUSES, updateOrder, type OrderStatus } from "@/lib/orders";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -19,7 +19,7 @@ export async function PUT(request: Request, { params }: Params) {
   const patch: { status?: OrderStatus; tracking?: string } = {};
   if ("status" in raw) {
     const status = String(raw.status);
-    if (!ORDER_STATUSES.includes(status as OrderStatus)) {
+    if (!MANUAL_STATUSES.includes(status as OrderStatus)) {
       return NextResponse.json({ error: "statut_invalide" }, { status: 400 });
     }
     patch.status = status as OrderStatus;

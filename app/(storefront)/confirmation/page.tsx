@@ -1,22 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef } from "react";
 import ui from "@/components/ui.module.css";
-import { useCart } from "@/lib/cart";
+import { clear } from "@/lib/cart";
 import styles from "./confirmation.module.css";
 
-export default function Confirmation() {
+function ConfirmationInner() {
   const router = useRouter();
-  const { hydrated, lastOrder } = useCart();
+  const params = useSearchParams();
+  const orderNo = params.get("no");
+  const cleared = useRef(false);
 
-  // Reached without an order behind it (a bookmark, a refreshed tab).
+  // Reached from the Genius Pay success redirect (?no=…). Empty the cart once
+  // (the webhook is what actually confirms and emails the order); with no order
+  // number it was reached by mistake, so send them home.
   useEffect(() => {
-    if (hydrated && !lastOrder) router.replace("/");
-  }, [hydrated, lastOrder, router]);
+    if (!orderNo) {
+      router.replace("/");
+      return;
+    }
+    if (!cleared.current) {
+      cleared.current = true;
+      clear();
+    }
+  }, [orderNo, router]);
 
-  if (!hydrated || !lastOrder) return <main className={ui.page} />;
+  if (!orderNo) return <main className={ui.page} />;
 
   return (
     <main className={ui.page}>
@@ -35,19 +46,31 @@ export default function Confirmation() {
           />
         </svg>
 
-        <div className={ui.kicker}>COMMANDE CONFIRMÉE</div>
+        <div className={ui.kicker}>PAIEMENT REÇU</div>
         <h1 className={styles.title}>Merci.</h1>
         <p className={styles.text}>
-          Votre pièce entre en préparation à l&apos;atelier.{" "}
-          {lastOrder.emailed
-            ? "Vous recevrez un email de confirmation, puis un suivi dès l'expédition."
-            : "Notez votre numéro de commande : nous vous écrirons dès l'expédition."}
+          Votre paiement est confirmé et votre pièce entre en préparation à
+          l&apos;atelier. Un email de confirmation vous parvient, puis un suivi
+          dès l&apos;expédition.
         </p>
-        <div className={styles.orderNo}>Commande N° {lastOrder.no}</div>
-        <Link href="/collection" className={ui.cta}>
-          Poursuivre la visite
-        </Link>
+        <div className={styles.orderNo}>Commande N° {orderNo}</div>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+          <Link href={`/suivi?no=${orderNo}`} className={ui.cta}>
+            Suivre ma commande
+          </Link>
+          <Link href="/collection" className={ui.ghost} style={{ alignSelf: "center" }}>
+            Poursuivre la visite →
+          </Link>
+        </div>
       </section>
     </main>
+  );
+}
+
+export default function Confirmation() {
+  return (
+    <Suspense fallback={<main className={ui.page} />}>
+      <ConfirmationInner />
+    </Suspense>
   );
 }

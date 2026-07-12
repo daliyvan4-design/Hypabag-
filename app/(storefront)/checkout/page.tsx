@@ -1,58 +1,74 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
 import { useCart } from "@/lib/cart";
-import { formatEuro } from "@/lib/format";
+import { eurToXof, formatEuro, formatXof } from "@/lib/format";
 import styles from "./checkout.module.css";
 
-export default function Checkout() {
+function CheckoutForm() {
   const router = useRouter();
-  const { hydrated, lines, subtotal, placeOrder, markOrderEmailed } = useCart();
-  const ordering = useRef(false);
+  const params = useSearchParams();
+  const { hydrated, lines, subtotal } = useCart();
+  const [status, setStatus] = useState<"idle" | "redirecting" | "error">(
+    "idle",
+  );
+  const [message, setMessage] = useState(
+    params.get("error") === "paiement"
+      ? "Le paiement n'a pas abouti. Vous pouvez réessayer."
+      : "",
+  );
 
-  // Nothing to pay for: send them back to the (empty) cart. Placing an order
-  // also empties it, so that path has to opt out of the guard.
+  // Empty cart: nothing to pay for.
   useEffect(() => {
-    if (hydrated && lines.length === 0 && !ordering.current) {
-      router.replace("/panier");
-    }
+    if (hydrated && lines.length === 0) router.replace("/panier");
   }, [hydrated, lines.length, router]);
 
-  // No payment processor is wired up: confirming records the order locally and
-  // asks the server to email it. Card fields are read by nobody and sent nowhere.
+  // Genius Pay hosts the payment: we create a transaction, then redirect the
+  // customer to the checkout_url. The webhook confirms the order afterwards.
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const basket = lines.map((line) => ({ slug: line.slug, qte: line.qte }));
-
-    ordering.current = true;
-    const orderNo = placeOrder();
-    router.push("/confirmation");
+    setStatus("redirecting");
+    setMessage("");
 
     try {
-      const response = await fetch("/api/orders", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderNo,
           email: form.get("email"),
           prenom: form.get("given-name"),
           nom: form.get("family-name"),
-          lines: basket,
+          phone: form.get("tel"),
+          lines: lines.map((l) => ({ slug: l.slug, qte: l.qte })),
         }),
       });
       const result: unknown = await response.json().catch(() => null);
-      markOrderEmailed(
-        response.ok &&
-          (result as { customerEmailed?: boolean })?.customerEmailed === true,
+
+      if (response.ok) {
+        const url = (result as { checkoutUrl?: string }).checkoutUrl;
+        if (url) {
+          window.location.href = url; // leave for the Genius Pay hosted page
+          return;
+        }
+      }
+
+      setStatus("error");
+      const err = (result as { error?: string })?.error;
+      setMessage(
+        err === "rupture"
+          ? "Une pièce de votre panier vient d'être épuisée."
+          : err === "payment_not_configured"
+            ? "Le paiement n'est pas encore configuré."
+            : "Impossible d'ouvrir le paiement. Réessayez dans un instant.",
       );
     } catch {
-      // The order still stands; only the email failed.
-      markOrderEmailed(false);
+      setStatus("error");
+      setMessage("Connexion au paiement impossible. Réessayez.");
     }
   }
 
@@ -106,6 +122,15 @@ export default function Checkout() {
                   className={ui.input}
                 />
               </div>
+              <input
+                required
+                type="tel"
+                name="tel"
+                autoComplete="tel"
+                placeholder="Téléphone (ex. +225 07 00 00 00 00)"
+                aria-label="Téléphone"
+                className={ui.input}
+              />
 
               <div className={ui.formTitle}>Livraison</div>
               <input
@@ -131,7 +156,6 @@ export default function Checkout() {
                   type="text"
                   name="postal-code"
                   autoComplete="postal-code"
-                  inputMode="numeric"
                   placeholder="Code postal"
                   aria-label="Code postal"
                   className={ui.input}
@@ -151,50 +175,8 @@ export default function Checkout() {
                 type="text"
                 name="country"
                 autoComplete="country-name"
-                defaultValue="France"
+                defaultValue="Côte d'Ivoire"
                 aria-label="Pays"
-                className={ui.input}
-              />
-
-              <div className={ui.formTitle}>Paiement</div>
-              <input
-                required
-                type="text"
-                name="cc-number"
-                autoComplete="cc-number"
-                inputMode="numeric"
-                placeholder="Numéro de carte"
-                aria-label="Numéro de carte"
-                className={ui.input}
-              />
-              <div className={ui.formRow}>
-                <input
-                  required
-                  type="text"
-                  name="cc-exp"
-                  autoComplete="cc-exp"
-                  placeholder="MM / AA"
-                  aria-label="Date d'expiration"
-                  className={ui.input}
-                />
-                <input
-                  required
-                  type="text"
-                  name="cc-csc"
-                  autoComplete="cc-csc"
-                  inputMode="numeric"
-                  placeholder="CVC"
-                  aria-label="Cryptogramme visuel"
-                  className={ui.input}
-                />
-              </div>
-              <input
-                required
-                type="text"
-                name="cc-name"
-                autoComplete="cc-name"
-                placeholder="Nom sur la carte"
-                aria-label="Nom sur la carte"
                 className={ui.input}
               />
             </div>
@@ -231,18 +213,42 @@ export default function Checkout() {
                   <span>Total</span>
                   <span>{formatEuro(subtotal)}</span>
                 </div>
+                <div className={styles.xof}>
+                  Débité {formatXof(eurToXof(subtotal))} via Genius Pay
+                </div>
 
-                <button type="submit" className={ui.ctaWide}>
-                  Confirmer la commande
+                <button
+                  type="submit"
+                  className={ui.ctaWide}
+                  disabled={status === "redirecting"}
+                >
+                  {status === "redirecting"
+                    ? "Ouverture du paiement…"
+                    : "Payer"}
                 </button>
-                <p className={ui.note}>
-                  Paiement sécurisé. Aucune donnée n&apos;est conservée.
-                </p>
+                {message ? (
+                  <p className={styles.payError} role="alert">
+                    {message}
+                  </p>
+                ) : (
+                  <p className={ui.note}>
+                    Paiement sécurisé via Genius Pay (Wave, Orange Money, MTN,
+                    carte).
+                  </p>
+                )}
               </div>
             </div>
           </form>
         </div>
       </section>
     </main>
+  );
+}
+
+export default function Checkout() {
+  return (
+    <Suspense fallback={<main className={ui.page} />}>
+      <CheckoutForm />
+    </Suspense>
   );
 }

@@ -151,3 +151,16 @@ export async function reserveStock(
   });
   return result;
 }
+
+/** Give reserved stock back when a payment fails, is cancelled, or expires. */
+export async function releaseStock(
+  lines: { slug: string; qte: number }[],
+): Promise<void> {
+  await mutateCollection<Piece[]>(COLLECTION, seedPieces, (current) =>
+    current.map((piece) => {
+      const line = lines.find((l) => l.slug === piece.slug);
+      if (!line || typeof piece.stock !== "number") return piece;
+      return { ...piece, stock: piece.stock + line.qte };
+    }),
+  );
+}

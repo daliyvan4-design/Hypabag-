@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
-  ORDER_STATUSES,
+  MANUAL_STATUSES,
   ORDER_STATUS_LABELS,
   type OrderStatus,
 } from "@/lib/order-status";
@@ -19,9 +19,17 @@ export function OrderControls({
   tracking?: string;
 }) {
   const router = useRouter();
-  const [value, setValue] = useState<OrderStatus>(status);
+  const manual = MANUAL_STATUSES.includes(status);
+  const [value, setValue] = useState<OrderStatus>(
+    manual ? status : "en_preparation",
+  );
   const [track, setTrack] = useState(tracking ?? "");
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
+
+  // Payment-stage orders (awaiting/failed) aren't fulfilled by hand.
+  if (!manual) {
+    return <span className={styles.badge}>{ORDER_STATUS_LABELS[status]}</span>;
+  }
 
   const dirty = value !== status || track !== (tracking ?? "");
 
@@ -53,7 +61,7 @@ export function OrderControls({
         onChange={(e) => setValue(e.target.value as OrderStatus)}
         aria-label="Statut de la commande"
       >
-        {ORDER_STATUSES.map((s) => (
+        {MANUAL_STATUSES.map((s) => (
           <option key={s} value={s}>
             {ORDER_STATUS_LABELS[s]}
           </option>
