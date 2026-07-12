@@ -1,14 +1,38 @@
 import "server-only";
-import { getPool, hasPostgres } from "./db";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 /**
- * Fixed-window rate limiter for the public endpoints that can trigger email or
- * guess the admin password. Shared across instances via Postgres when a
- * database is configured (so it actually holds under real traffic); falls back
- * to per-process memory for local development.
+ * Rate limiter for the public endpoints that can trigger email, a payment, or
+ * an admin-password guess. Backed by Upstash Redis (sliding window, atomic,
+ * shared across all instances) when configured; falls back to per-process
+ * memory for local development.
  */
-const WINDOW_SECONDS = 10 * 60;
+const WINDOW = "10 m";
 const MAX_REQUESTS = 5;
+const WINDOW_MS = 10 * 60 * 1000;
+
+/* Upstash backend ----------------------------------------------------------- */
+
+let limiter: Ratelimit | null | undefined;
+
+function getLimiter(): Ratelimit | null {
+  if (limiter !== undefined) return limiter;
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    limiter = null;
+    return null;
+  }
+  limiter = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(MAX_REQUESTS, WINDOW),
+    prefix: "hypa_rl",
+    analytics: false,
+  });
+  return limiter;
+}
 
 /* In-memory fallback -------------------------------------------------------- */
 
@@ -16,8 +40,7 @@ const memory = new Map<string, number[]>();
 
 function allowInMemory(key: string): boolean {
   const now = Date.now();
-  const windowMs = WINDOW_SECONDS * 1000;
-  const recent = (memory.get(key) ?? []).filter((at) => now - at < windowMs);
+  const recent = (memory.get(key) ?? []).filter((at) => now - at < WINDOW_MS);
 
   if (recent.length >= MAX_REQUESTS) {
     memory.set(key, recent);
@@ -28,62 +51,23 @@ function allowInMemory(key: string): boolean {
 
   if (memory.size > 1000) {
     for (const [entry, times] of memory) {
-      if (times.every((at) => now - at >= windowMs)) memory.delete(entry);
+      if (times.every((at) => now - at >= WINDOW_MS)) memory.delete(entry);
     }
   }
   return true;
 }
 
-/* Postgres backend ---------------------------------------------------------- */
-
-let schemaReady: Promise<void> | null = null;
-
-function ensureSchema(): Promise<void> {
-  if (!schemaReady) {
-    schemaReady = getPool()
-      .query(
-        `CREATE TABLE IF NOT EXISTS rate_limit (
-           key text PRIMARY KEY,
-           window_start timestamptz NOT NULL,
-           count int NOT NULL
-         )`,
-      )
-      .then(() => undefined)
-      .catch((error) => {
-        schemaReady = null;
-        throw error;
-      });
-  }
-  return schemaReady;
-}
-
-async function allowInPostgres(key: string): Promise<boolean> {
-  await ensureSchema();
-  // Upsert that resets the window once it has elapsed, otherwise increments.
-  const result = await getPool().query<{ count: number }>(
-    `INSERT INTO rate_limit (key, window_start, count) VALUES ($1, now(), 1)
-     ON CONFLICT (key) DO UPDATE SET
-       window_start = CASE
-         WHEN rate_limit.window_start < now() - ($2 * interval '1 second')
-         THEN now() ELSE rate_limit.window_start END,
-       count = CASE
-         WHEN rate_limit.window_start < now() - ($2 * interval '1 second')
-         THEN 1 ELSE rate_limit.count + 1 END
-     RETURNING count`,
-    [key, WINDOW_SECONDS],
-  );
-  return (result.rows[0]?.count ?? 1) <= MAX_REQUESTS;
-}
-
 /* Public API ---------------------------------------------------------------- */
 
 export async function allow(key: string): Promise<boolean> {
-  if (!hasPostgres()) return allowInMemory(key);
+  const rl = getLimiter();
+  if (!rl) return allowInMemory(key);
   try {
-    return await allowInPostgres(key);
+    const { success } = await rl.limit(key);
+    return success;
   } catch (error) {
     // Never let the limiter's own failure lock users out; degrade to memory.
-    console.error("rate-limit: postgres failed, using memory —", error);
+    console.error("rate-limit: upstash failed, using memory —", error);
     return allowInMemory(key);
   }
 }
