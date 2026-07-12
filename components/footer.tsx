@@ -112,15 +112,32 @@ export function Footer() {
             <Link href="/suivi" className={styles.link}>
               Suivi de commande
             </Link>
-            <span className={styles.linkMuted}>Livraison</span>
-            <span className={styles.linkMuted}>Retours</span>
+            <Link href="/livraison" className={styles.link}>
+              Livraison
+            </Link>
+            <Link href="/retours" className={styles.link}>
+              Retours
+            </Link>
           </div>
         </div>
       </div>
 
       <div className={styles.bottom}>
-        <Image src={LOGO_MARK} alt="" width={20} height={20} />
-        <span>© 2026 HYPA · Maroquinerie artisanale, Paris</span>
+        <div className={styles.bottomLeft}>
+          <Image src={LOGO_MARK} alt="" width={20} height={20} />
+          <span>© 2026 HYPA · Maroquinerie artisanale, Paris</span>
+        </div>
+        <div className={styles.legal}>
+          <Link href="/mentions-legales" className={styles.legalLink}>
+            Mentions légales
+          </Link>
+          <Link href="/cgv" className={styles.legalLink}>
+            CGV
+          </Link>
+          <Link href="/confidentialite" className={styles.legalLink}>
+            Confidentialité
+          </Link>
+        </div>
       </div>
     </footer>
   );
