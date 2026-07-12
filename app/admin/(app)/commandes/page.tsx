@@ -1,6 +1,7 @@
 import { formatEuro } from "@/lib/format";
 import { getOrders } from "@/lib/orders";
 import { getSubscribers } from "@/lib/subscribers";
+import { OrderControls } from "./order-controls";
 import admin from "../../admin.module.css";
 
 function frenchDate(iso: string): string {
@@ -43,12 +44,13 @@ export default async function AdminOrders() {
                 <th>Détail</th>
                 <th className={admin.right}>Total</th>
                 <th>Email</th>
+                <th>Statut &amp; suivi</th>
               </tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={admin.empty}>
+                  <td colSpan={7} className={admin.empty}>
                     Aucune commande enregistrée.
                   </td>
                 </tr>
@@ -78,6 +80,13 @@ export default async function AdminOrders() {
                       <span className={order.emailed ? admin.tag : admin.tagMuted}>
                         {order.emailed ? "envoyé" : "non envoyé"}
                       </span>
+                    </td>
+                    <td>
+                      <OrderControls
+                        orderNo={order.orderNo}
+                        status={order.status}
+                        tracking={order.tracking}
+                      />
                     </td>
                   </tr>
                 ))

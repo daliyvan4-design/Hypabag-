@@ -30,6 +30,7 @@ export default async function AdminProducts() {
                 <th>Pièce</th>
                 <th>Matière</th>
                 <th className={admin.right}>Prix</th>
+                <th className={admin.right}>Stock</th>
                 <th>Description</th>
                 <th></th>
               </tr>
@@ -55,6 +56,17 @@ export default async function AdminProducts() {
                   <td>{product.matiere}</td>
                   <td className={`${admin.right} ${admin.mono}`}>
                     {formatEuro(product.prix)}
+                  </td>
+                  <td className={admin.right}>
+                    <span
+                      className={
+                        product.stock === 0
+                          ? admin.tagMuted
+                          : admin.mono
+                      }
+                    >
+                      {product.stock === 0 ? "épuisé" : (product.stock ?? "—")}
+                    </span>
                   </td>
                   <td>
                     <span className={product.paragraphes?.length ? admin.tag : admin.tagMuted}>

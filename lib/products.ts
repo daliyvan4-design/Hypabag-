@@ -45,9 +45,10 @@ export type ProductInput = {
   nom: string;
   matiere: string;
   prix: number;
-  phrase: string;
   largeur: number;
   decalage: number;
+  stock: number;
+  phrase: string;
   sousTitre?: string;
   paragraphes?: string[];
   photo?: { src: string; alt: string; cartel: string };
@@ -113,8 +114,40 @@ function normalise(input: ProductInput): Omit<Piece, "slug"> {
     phrase: input.phrase.trim(),
     largeur: input.largeur,
     decalage: input.decalage,
+    stock: Math.max(0, Math.round(input.stock)),
     ...(input.sousTitre?.trim() ? { sousTitre: input.sousTitre.trim() } : {}),
     ...(paragraphes.length ? { paragraphes } : {}),
     ...(input.photo?.src ? { photo: input.photo } : {}),
   };
+}
+
+export type StockResult =
+  | { ok: true }
+  | { ok: false; error: "rupture"; slug: string };
+
+/**
+ * Atomically verify and decrement stock for an order's lines. Runs the whole
+ * check-and-decrement inside one locked read-modify-write so two buyers can't
+ * both claim the last piece. Untracked stock (undefined) is left alone.
+ */
+export async function reserveStock(
+  lines: { slug: string; qte: number }[],
+): Promise<StockResult> {
+  let result: StockResult = { ok: true };
+  await mutateCollection<Piece[]>(COLLECTION, seedPieces, (current) => {
+    result = { ok: true };
+    for (const line of lines) {
+      const piece = current.find((p) => p.slug === line.slug);
+      if (piece && typeof piece.stock === "number" && piece.stock < line.qte) {
+        result = { ok: false, error: "rupture", slug: line.slug };
+        return current; // no change
+      }
+    }
+    return current.map((piece) => {
+      const line = lines.find((l) => l.slug === piece.slug);
+      if (!line || typeof piece.stock !== "number") return piece;
+      return { ...piece, stock: Math.max(0, piece.stock - line.qte) };
+    });
+  });
+  return result;
 }

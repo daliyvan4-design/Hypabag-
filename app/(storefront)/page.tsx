@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NewsletterPopup } from "@/components/newsletter-popup";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
 import { HERO_POSTER } from "@/lib/media";
@@ -121,6 +122,8 @@ export default async function Accueil() {
           </Link>
         </div>
       </section>
+
+      <NewsletterPopup />
     </main>
   );
 }

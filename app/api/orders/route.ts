@@ -8,7 +8,7 @@ import {
 } from "@/lib/email";
 import { formatEuro } from "@/lib/format";
 import { recordOrder } from "@/lib/orders";
-import { getProduct } from "@/lib/products";
+import { getProduct, reserveStock } from "@/lib/products";
 import { allow, clientKey } from "@/lib/rate-limit";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -54,7 +54,7 @@ function parse(body: unknown): Payload | null {
 }
 
 export async function POST(request: Request) {
-  if (!allow(clientKey(request))) {
+  if (!(await allow(clientKey(request)))) {
     return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
   }
 
@@ -84,6 +84,15 @@ export async function POST(request: Request) {
   }
   const total = formatEuro(subtotal);
 
+  // Reserve stock atomically before confirming — a sold-out piece stops here.
+  const reserved = await reserveStock(order.lines);
+  if (!reserved.ok) {
+    return NextResponse.json(
+      { error: "rupture", slug: reserved.slug },
+      { status: 409 },
+    );
+  }
+
   const alert = await send(config, {
     to: config.shop,
     subject: `Nouvelle commande ${order.orderNo} — ${total}`,
@@ -101,6 +110,7 @@ export async function POST(request: Request) {
         html: orderConfirmationHtml({
           orderNo: order.orderNo,
           prenom: order.prenom,
+          email: order.email,
           lines: emailLines,
           total,
         }),

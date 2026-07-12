@@ -63,21 +63,22 @@ export async function send(
 /* Templates ---------------------------------------------------------------- */
 
 const ECRU = "#F4EEE4";
+const CREME = "#EBE1CF";
 const BORDEAUX = "#632434";
 const ENCRE = "#2A2320";
+const SERIF = "Georgia, 'Times New Roman', serif";
+const SANS = "Helvetica, Arial, sans-serif";
+const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+// e_trim strips the logo's near-white JPEG margin so it doesn't show a faint
+// box on the white email card.
+const LOGO = CLOUD
+  ? `https://res.cloudinary.com/${CLOUD}/image/upload/e_trim:5,w_240,q_auto/hypa/hypa-logo-full.jpg`
+  : "";
 
-function shell(inner: string): string {
-  return `<!doctype html><html lang="fr"><body style="margin:0;padding:32px 16px;background:${ECRU};font-family:Helvetica,Arial,sans-serif;color:${ENCRE};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-    <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;">
-      <tr><td style="padding-bottom:24px;font-size:11px;letter-spacing:0.28em;color:${BORDEAUX};">HYPA</td></tr>
-      ${inner}
-      <tr><td style="padding-top:32px;border-top:1px solid rgba(42,35,32,0.15);font-size:11px;color:rgba(42,35,32,0.5);">
-        © 2026 HYPA · Maroquinerie artisanale, Paris
-      </td></tr>
-    </table>
-  </td></tr></table>
-</body></html>`;
+export function siteUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://hypa-one.vercel.app"
+  ).replace(/\/$/, "");
 }
 
 function escapeHtml(value: string): string {
@@ -94,45 +95,92 @@ function escapeHtml(value: string): string {
   );
 }
 
+function button(href: string, label: string): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;"><tr>
+    <td align="center" bgcolor="${BORDEAUX}" style="border-radius:28px;">
+      <a href="${href}" style="display:inline-block;padding:14px 32px;font-family:${SANS};font-size:13px;letter-spacing:0.05em;color:${ECRU};text-decoration:none;border-radius:28px;">${label}</a>
+    </td>
+  </tr></table>`;
+}
+
+/** Outer card with the wordmark header and the maison footer. */
+function shell(opts: {
+  preheader: string;
+  inner: string;
+  align?: string;
+}): string {
+  const align = opts.align ?? "left";
+  const header = LOGO
+    ? `<img src="${LOGO}" width="120" alt="HYPA" style="display:block;margin:0 auto;border:0;" />`
+    : `<div style="font-family:${SERIF};font-size:26px;letter-spacing:0.02em;color:${BORDEAUX};text-align:center;">HYPA</div>`;
+
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${ECRU};">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(opts.preheader)}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${ECRU};padding:40px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border:1px solid rgba(99,36,52,0.12);border-radius:18px;">
+        <tr><td style="padding:36px 44px 8px;">${header}</td></tr>
+        <tr><td style="padding:0 44px;"><div style="height:1px;background:rgba(42,35,32,0.1);"></div></td></tr>
+        <tr><td style="padding:30px 44px 8px;font-family:${SANS};color:${ENCRE};text-align:${align};">${opts.inner}</td></tr>
+        <tr><td style="padding:28px 44px 34px;">
+          <div style="height:1px;background:rgba(42,35,32,0.1);margin-bottom:18px;"></div>
+          <div style="font-family:${SANS};font-size:11px;line-height:1.7;color:rgba(42,35,32,0.5);text-align:center;">
+            HYPA · Maroquinerie artisanale, Paris<br/>
+            Chaque pièce est tissée à la main, à partir d'un unique cordon.
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 export type OrderLine = { nom: string; qte: number; total: string };
 
 export function orderConfirmationHtml(order: {
   orderNo: string;
   prenom: string;
+  email: string;
   lines: OrderLine[];
   total: string;
 }): string {
   const rows = order.lines
     .map(
       (line) => `<tr>
-        <td style="padding:10px 0;border-bottom:1px solid rgba(42,35,32,0.12);font-size:15px;">
-          ${escapeHtml(line.nom)} <span style="opacity:0.5;">× ${line.qte}</span>
+        <td style="padding:12px 0;border-bottom:1px solid rgba(42,35,32,0.1);font-family:${SERIF};font-size:16px;color:${ENCRE};">
+          ${escapeHtml(line.nom)} <span style="font-family:${SANS};font-size:13px;color:rgba(42,35,32,0.5);">× ${line.qte}</span>
         </td>
-        <td align="right" style="padding:10px 0;border-bottom:1px solid rgba(42,35,32,0.12);font-size:15px;color:${BORDEAUX};">
+        <td align="right" style="padding:12px 0;border-bottom:1px solid rgba(42,35,32,0.1);font-family:${SERIF};font-size:15px;color:${BORDEAUX};">
           ${escapeHtml(line.total)}
         </td>
       </tr>`,
     )
     .join("");
 
-  return shell(`
-    <tr><td style="font-size:34px;color:${BORDEAUX};padding-bottom:16px;">Merci, ${escapeHtml(order.prenom)}.</td></tr>
-    <tr><td style="font-size:15px;line-height:1.8;opacity:0.75;padding-bottom:28px;">
-      Votre pièce entre en préparation à l'atelier. Vous recevrez un suivi dès l'expédition.
-    </td></tr>
-    <tr><td>
+  const track = `${siteUrl()}/suivi?no=${encodeURIComponent(order.orderNo)}`;
+
+  return shell({
+    preheader: `Merci ${order.prenom} — votre commande ${order.orderNo} est confirmée.`,
+    inner: `
+      <div style="font-size:11px;letter-spacing:0.24em;color:${BORDEAUX};margin-bottom:14px;">COMMANDE CONFIRMÉE</div>
+      <div style="font-family:${SERIF};font-size:32px;color:${BORDEAUX};margin-bottom:16px;">Merci, ${escapeHtml(order.prenom)}.</div>
+      <p style="font-size:15px;line-height:1.8;color:rgba(42,35,32,0.75);margin:0 0 26px;">
+        Votre pièce entre en préparation à l'atelier. Chaque nœud est vérifié à la main
+        avant l'expédition, sous écrin HYPA. Vous recevrez un suivi dès qu'elle prend la route.
+      </p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         ${rows}
         <tr>
-          <td style="padding:16px 0 0;font-size:17px;color:${BORDEAUX};">Total</td>
-          <td align="right" style="padding:16px 0 0;font-size:17px;color:${BORDEAUX};">${escapeHtml(order.total)}</td>
+          <td style="padding:18px 0 0;font-family:${SERIF};font-size:19px;color:${BORDEAUX};">Total</td>
+          <td align="right" style="padding:18px 0 0;font-family:${SERIF};font-size:19px;color:${BORDEAUX};">${escapeHtml(order.total)}</td>
         </tr>
       </table>
-    </td></tr>
-    <tr><td style="padding-top:28px;font-size:12px;letter-spacing:0.14em;opacity:0.5;">
-      COMMANDE N° ${escapeHtml(order.orderNo)}
-    </td></tr>
-  `);
+      <div style="margin:30px 0 8px;">${button(track, "Suivre ma commande")}</div>
+      <div style="text-align:center;font-size:12px;letter-spacing:0.14em;color:rgba(42,35,32,0.5);margin-top:20px;">
+        COMMANDE N° ${escapeHtml(order.orderNo)}
+      </div>`,
+  });
 }
 
 export function orderAlertHtml(order: {
@@ -144,39 +192,55 @@ export function orderAlertHtml(order: {
   total: string;
 }): string {
   const rows = order.lines
-    .map((line) => `<tr><td style="font-size:14px;padding:4px 0;">${escapeHtml(line.nom)} × ${line.qte}</td><td align="right" style="font-size:14px;">${escapeHtml(line.total)}</td></tr>`)
+    .map(
+      (line) =>
+        `<tr><td style="font-family:${SANS};font-size:14px;padding:6px 0;color:${ENCRE};">${escapeHtml(line.nom)} × ${line.qte}</td><td align="right" style="font-family:${SANS};font-size:14px;padding:6px 0;color:${BORDEAUX};">${escapeHtml(line.total)}</td></tr>`,
+    )
     .join("");
 
-  return shell(`
-    <tr><td style="font-size:28px;color:${BORDEAUX};padding-bottom:16px;">Nouvelle commande</td></tr>
-    <tr><td style="font-size:14px;line-height:1.9;padding-bottom:20px;">
-      <strong>${escapeHtml(order.prenom)} ${escapeHtml(order.nom)}</strong><br/>
-      ${escapeHtml(order.email)}<br/>
-      Commande n° ${escapeHtml(order.orderNo)}
-    </td></tr>
-    <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
-      <tr><td style="padding-top:12px;border-top:1px solid rgba(42,35,32,0.15);font-size:16px;color:${BORDEAUX};">Total</td>
-      <td align="right" style="padding-top:12px;border-top:1px solid rgba(42,35,32,0.15);font-size:16px;color:${BORDEAUX};">${escapeHtml(order.total)}</td></tr>
-    </table></td></tr>
-    <tr><td style="padding-top:24px;font-size:12px;opacity:0.55;line-height:1.7;">
-      Aucun paiement n'a été encaissé : le site n'a pas de processeur de paiement branché.
-    </td></tr>
-  `);
+  return shell({
+    preheader: `Nouvelle commande ${order.orderNo} — ${order.total}`,
+    inner: `
+      <div style="font-size:11px;letter-spacing:0.24em;color:${BORDEAUX};margin-bottom:14px;">NOUVELLE COMMANDE</div>
+      <div style="background:${CREME};border-radius:12px;padding:18px 20px;font-family:${SANS};font-size:14px;line-height:1.9;color:${ENCRE};margin-bottom:22px;">
+        <strong>${escapeHtml(order.prenom)} ${escapeHtml(order.nom)}</strong><br/>
+        <a href="mailto:${escapeHtml(order.email)}" style="color:${BORDEAUX};text-decoration:none;">${escapeHtml(order.email)}</a><br/>
+        Commande n° ${escapeHtml(order.orderNo)}
+      </div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
+        <tr><td style="padding-top:14px;border-top:1px solid rgba(42,35,32,0.15);font-family:${SERIF};font-size:17px;color:${BORDEAUX};">Total</td>
+        <td align="right" style="padding-top:14px;border-top:1px solid rgba(42,35,32,0.15);font-family:${SERIF};font-size:17px;color:${BORDEAUX};">${escapeHtml(order.total)}</td></tr>
+      </table>
+      <p style="font-size:12px;line-height:1.7;color:rgba(42,35,32,0.55);margin:22px 0 0;">
+        Le stock des pièces a été décrémenté. Aucun paiement n'a été encaissé :
+        aucun processeur de paiement n'est branché.
+      </p>`,
+  });
 }
 
 export function subscriberAlertHtml(email: string): string {
-  return shell(`
-    <tr><td style="font-size:28px;color:${BORDEAUX};padding-bottom:16px;">Nouvel inscrit</td></tr>
-    <tr><td style="font-size:15px;line-height:1.8;">${escapeHtml(email)}</td></tr>
-  `);
+  return shell({
+    preheader: `Nouvel inscrit : ${email}`,
+    inner: `
+      <div style="font-size:11px;letter-spacing:0.24em;color:${BORDEAUX};margin-bottom:14px;">NOUVEL INSCRIT</div>
+      <div style="font-family:${SERIF};font-size:24px;color:${BORDEAUX};margin-bottom:10px;">Une nouvelle adresse.</div>
+      <p style="font-size:15px;line-height:1.8;color:${ENCRE};margin:0;">
+        <a href="mailto:${escapeHtml(email)}" style="color:${BORDEAUX};text-decoration:none;">${escapeHtml(email)}</a>
+      </p>`,
+  });
 }
 
 export function welcomeHtml(): string {
-  return shell(`
-    <tr><td style="font-size:30px;color:${BORDEAUX};padding-bottom:16px;">Bienvenue.</td></tr>
-    <tr><td style="font-size:15px;line-height:1.8;opacity:0.75;">
-      Vous recevrez les nouvelles pièces en avant-première, à mesure qu'elles naissent à l'atelier.
-      Une invitation, pas une lettre d'info.
-    </td></tr>
-  `);
+  return shell({
+    align: "center",
+    preheader: "Bienvenue chez HYPA — une invitation, pas une lettre d'info.",
+    inner: `
+      <div style="font-size:11px;letter-spacing:0.24em;color:${BORDEAUX};margin-bottom:14px;">RESTER PROCHE</div>
+      <div style="font-family:${SERIF};font-size:32px;color:${BORDEAUX};margin-bottom:16px;">Bienvenue.</div>
+      <p style="font-size:15px;line-height:1.85;color:rgba(42,35,32,0.75);margin:0 0 28px;">
+        Vous recevrez les nouvelles pièces en avant-première, à mesure qu'elles
+        naissent à l'atelier. Une invitation, pas une lettre d'info.
+      </p>
+      ${button(`${siteUrl()}/collection`, "Découvrir la collection")}`,
+  });
 }

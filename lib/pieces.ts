@@ -10,6 +10,8 @@ export type Piece = {
   /** Desktop gallery hang: column width in %, and how far the piece drops. */
   largeur: number;
   decalage: number;
+  /** Pieces in stock. 0 = sold out; undefined = untracked (always available). */
+  stock?: number;
   /**
    * Long-form copy. `specs` (dimensions, matières, délais) are commercial
    * claims: only Nour's come from the atelier. Don't invent the others.
@@ -29,6 +31,7 @@ export type Piece = {
 export const seedPieces: Piece[] = [
   {
     slug: "nour",
+    stock: 1,
     nom: "Nour",
     matiere: "Cordon bordeaux + laiton",
     prix: 1480,
@@ -59,6 +62,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "lueur",
+    stock: 2,
     nom: "Lueur",
     matiere: "Cordon écru + laiton",
     prix: 980,
@@ -72,6 +76,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "rive",
+    stock: 1,
     nom: "Rive",
     matiere: "Tressage large, besace",
     prix: 1690,
@@ -85,6 +90,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "songe",
+    stock: 3,
     nom: "Songe",
     matiere: "Mini sac, tressage rosé",
     prix: 860,
@@ -98,6 +104,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "trame",
+    stock: 2,
     nom: "Trame",
     matiere: "Cabas, tressage double fil",
     prix: 1920,
@@ -111,6 +118,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "echo",
+    stock: 4,
     nom: "Écho",
     matiere: "Pochette fine bordeaux",
     prix: 720,
@@ -124,6 +132,7 @@ export const seedPieces: Piece[] = [
   },
   {
     slug: "aube",
+    stock: 2,
     nom: "Aube",
     matiere: "Sac seau, tressage sable",
     prix: 1260,

@@ -48,13 +48,19 @@ export default async function Collection() {
               }}
             >
               <div className={styles.imgWrap}>
+                {piece.stock === 0 ? (
+                  <span className={ui.soldOut}>Épuisé</span>
+                ) : null}
                 {piece.photo?.src ? (
                   <Image
                     src={piece.photo.src}
                     alt=""
                     fill
                     sizes="(max-width: 860px) 100vw, 33vw"
-                    style={{ objectFit: "cover" }}
+                    style={{
+                      objectFit: "cover",
+                      filter: piece.stock === 0 ? "grayscale(0.4) opacity(0.7)" : undefined,
+                    }}
                   />
                 ) : (
                   <Striped />

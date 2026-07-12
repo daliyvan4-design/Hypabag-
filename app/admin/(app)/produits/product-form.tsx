@@ -75,6 +75,7 @@ export function ProductForm({ product }: { product?: Piece }) {
       sousTitre: data.get("sousTitre"),
       largeur: Number(data.get("largeur")),
       decalage: Number(data.get("decalage")),
+      stock: Number(data.get("stock")),
       paragraphes: String(data.get("paragraphes") ?? "")
         .split(/\n{2,}/)
         .map((p) => p.trim())
@@ -145,6 +146,22 @@ export function ProductForm({ product }: { product?: Piece }) {
             className={styles.input}
           />
         </div>
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="stock">
+          Stock <span className={styles.hint}>— nombre de pièces disponibles (0 = épuisé)</span>
+        </label>
+        <input
+          id="stock"
+          name="stock"
+          type="number"
+          min={0}
+          max={9999}
+          required
+          defaultValue={product?.stock ?? 1}
+          className={styles.input}
+        />
       </div>
 
       <div className={styles.field}>

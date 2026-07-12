@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "admin_not_configured" }, { status: 503 });
   }
   // Throttle password guessing per client.
-  if (!allow(`login:${clientKey(request)}`)) {
+  if (!(await allow(`login:${clientKey(request)}`))) {
     return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
   }
 

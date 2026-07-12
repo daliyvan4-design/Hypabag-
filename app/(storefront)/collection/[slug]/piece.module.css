@@ -146,6 +146,14 @@
   letter-spacing: 0.04em;
 }
 
+.stockHint {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--bordeaux);
+  /* Negative bottom pulls the 34px-top buy row up to a tight 16px gap. */
+  margin: 34px 0 -18px;
+}
+
 .buy {
   display: flex;
   align-items: center;

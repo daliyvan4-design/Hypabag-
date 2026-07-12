@@ -107,7 +107,10 @@ export function Footer() {
           <div>
             <div className={styles.columnTitle}>Service</div>
             <Link href="/panier" className={styles.link}>
-              Commandes
+              Panier
+            </Link>
+            <Link href="/suivi" className={styles.link}>
+              Suivi de commande
             </Link>
             <span className={styles.linkMuted}>Livraison</span>
             <span className={styles.linkMuted}>Retours</span>

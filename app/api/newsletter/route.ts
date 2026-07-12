@@ -11,7 +11,7 @@ import { addSubscriber } from "@/lib/subscribers";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request: Request) {
-  if (!allow(clientKey(request))) {
+  if (!(await allow(clientKey(request)))) {
     return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
   }
 

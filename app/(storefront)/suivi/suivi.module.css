@@ -1,0 +1,133 @@
+.page {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 110px var(--gutter) 150px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 34px;
+  max-width: 420px;
+}
+
+.input {
+  background: var(--ivoire);
+  border: 1px solid rgba(42, 35, 32, 0.14);
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--encre);
+  outline-offset: 2px;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--bordeaux);
+  margin: 4px 0 0;
+}
+
+/* Result card ------------------------------------------------------------- */
+
+.result {
+  margin-top: 40px;
+  background: var(--ivoire);
+  border: 1px solid var(--rule);
+  border-radius: 18px;
+  padding: 30px 32px;
+}
+
+.resultNo {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  opacity: 0.5;
+}
+
+.steps {
+  display: flex;
+  align-items: flex-start;
+  margin: 26px 0 8px;
+}
+
+.step {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  position: relative;
+  padding: 0 6px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(42, 35, 32, 0.18);
+  margin: 0 auto 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.dotDone {
+  composes: dot;
+  background: var(--bordeaux);
+}
+
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(42, 35, 32, 0.14);
+  z-index: 0;
+}
+
+.stepDone:not(:last-child)::after {
+  background: var(--bordeaux);
+}
+
+.stepLabel {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  opacity: 0.6;
+}
+
+.stepLabelDone {
+  composes: stepLabel;
+  color: var(--bordeaux);
+  opacity: 1;
+}
+
+.tracking {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.trackingLabel {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 4px;
+}
+
+.cancelled {
+  margin-top: 20px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--bordeaux);
+}
+
+.lines {
+  margin-top: 20px;
+  font-size: 13px;
+  opacity: 0.7;
+}

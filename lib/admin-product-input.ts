@@ -17,6 +17,7 @@ export function parseProductInput(body: unknown): ParsedInput {
   const prix = Number(raw.prix);
   const largeur = raw.largeur === undefined ? 30 : Number(raw.largeur);
   const decalage = raw.decalage === undefined ? 0 : Number(raw.decalage);
+  const stock = raw.stock === undefined ? 1 : Number(raw.stock);
 
   if (!nom || nom.length > 80) return { ok: false, error: "nom_requis" };
   if (!matiere || matiere.length > 120) return { ok: false, error: "matiere_requise" };
@@ -29,6 +30,9 @@ export function parseProductInput(body: unknown): ParsedInput {
   }
   if (!Number.isFinite(decalage) || decalage < 0 || decalage > 200) {
     return { ok: false, error: "decalage_invalide" };
+  }
+  if (!Number.isFinite(stock) || stock < 0 || stock > 9999) {
+    return { ok: false, error: "stock_invalide" };
   }
 
   const sousTitre = raw.sousTitre ? String(raw.sousTitre).trim() : undefined;
@@ -54,6 +58,6 @@ export function parseProductInput(body: unknown): ParsedInput {
 
   return {
     ok: true,
-    input: { nom, matiere, phrase, prix, largeur, decalage, sousTitre, paragraphes, photo },
+    input: { nom, matiere, phrase, prix, largeur, decalage, stock, sousTitre, paragraphes, photo },
   };
 }

@@ -106,6 +106,15 @@ export default async function PiecePage({ params }: Params) {
               </div>
             ) : null}
 
+            {typeof piece.stock === "number" &&
+            piece.stock > 0 &&
+            piece.stock <= 2 ? (
+              <div className={styles.stockHint}>
+                {piece.stock === 1
+                  ? "Dernière pièce disponible."
+                  : `Plus que ${piece.stock} pièces.`}
+              </div>
+            ) : null}
             <div className={styles.buy}>
               <div className={styles.price}>{formatEuro(piece.prix)}</div>
               <AddToCart piece={piece} />
