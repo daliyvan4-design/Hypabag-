@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/add-to-cart";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { getProduct, getProductNumero } from "@/lib/products";
 import styles from "./piece.module.css";
 
@@ -116,7 +116,7 @@ export default async function PiecePage({ params }: Params) {
               </div>
             ) : null}
             <div className={styles.buy}>
-              <div className={styles.price}>{formatEuro(piece.prix)}</div>
+              <div className={styles.price}>{formatXof(piece.prix)}</div>
               <AddToCart piece={piece} />
             </div>
           </div>

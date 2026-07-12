@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useCart } from "@/lib/cart";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { Striped } from "./striped";
 import styles from "./cart-drawer.module.css";
 import ui from "./ui.module.css";
@@ -101,7 +101,7 @@ export function CartDrawer() {
                     </div>
                   </div>
                   <div className={styles.prix}>
-                    {formatEuro(line.prix * line.qte)}
+                    {formatXof(line.prix * line.qte)}
                   </div>
                 </div>
               ))}
@@ -110,7 +110,7 @@ export function CartDrawer() {
             <div className={styles.foot}>
               <div className={ui.summaryTotal}>
                 <span>Total</span>
-                <span>{formatEuro(subtotal)}</span>
+                <span>{formatXof(subtotal)}</span>
               </div>
               <Link href="/checkout" className={ui.ctaWide}>
                 Procéder au paiement

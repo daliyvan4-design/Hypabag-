@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { getProducts } from "@/lib/products";
 import styles from "./collection.module.css";
 
@@ -70,7 +70,7 @@ export default async function Collection() {
               <div className={styles.meta}>
                 <div className={styles.line}>
                   <span className={styles.nom}>{piece.nom}</span>
-                  <span className={styles.prix}>{formatEuro(piece.prix)}</span>
+                  <span className={styles.prix}>{formatXof(piece.prix)}</span>
                 </div>
                 <div className={styles.phrase}>{piece.phrase}</div>
               </div>

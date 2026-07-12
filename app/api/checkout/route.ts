@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { siteUrl } from "@/lib/email";
-import { eurToXof } from "@/lib/format";
 import { createPayment, geniusPayConfigured } from "@/lib/genius-pay";
 import { recordPendingOrder, updateOrder } from "@/lib/orders";
 import { getProduct, releaseStock, reserveStock } from "@/lib/products";
@@ -82,8 +81,8 @@ export async function POST(request: Request) {
   }
 
   const orderNo = `HY-${Math.floor(100000 + Math.random() * 899999)}`;
-  const amountXof = eurToXof(subtotal);
 
+  // Prices are stored in XOF, so the charge is the subtotal itself.
   await recordPendingOrder({
     orderNo,
     createdAt: new Date().toISOString(),
@@ -93,11 +92,11 @@ export async function POST(request: Request) {
     phone: order.phone,
     lines,
     total: subtotal,
-    amountXof,
+    amountXof: subtotal,
   });
 
   const payment = await createPayment({
-    amount: amountXof,
+    amount: subtotal,
     currency: "XOF",
     customer: {
       phone: order.phone,

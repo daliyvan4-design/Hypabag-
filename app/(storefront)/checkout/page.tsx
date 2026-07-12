@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
 import { useCart } from "@/lib/cart";
-import { eurToXof, formatEuro, formatXof } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import styles from "./checkout.module.css";
 
 function CheckoutForm() {
@@ -195,7 +195,7 @@ function CheckoutForm() {
                       <div className={styles.recapQte}>Qté {line.qte}</div>
                     </div>
                     <div className={styles.recapPrix}>
-                      {formatEuro(line.prix * line.qte)}
+                      {formatXof(line.prix * line.qte)}
                     </div>
                   </div>
                 ))}
@@ -203,7 +203,7 @@ function CheckoutForm() {
                 <div className={styles.recapDivider} />
                 <div className={ui.summaryRow}>
                   <span>Sous-total</span>
-                  <span>{formatEuro(subtotal)}</span>
+                  <span>{formatXof(subtotal)}</span>
                 </div>
                 <div className={ui.summaryRow}>
                   <span>Livraison</span>
@@ -211,11 +211,9 @@ function CheckoutForm() {
                 </div>
                 <div className={ui.summaryTotal}>
                   <span>Total</span>
-                  <span>{formatEuro(subtotal)}</span>
+                  <span>{formatXof(subtotal)}</span>
                 </div>
-                <div className={styles.xof}>
-                  Débité {formatXof(eurToXof(subtotal))} via Genius Pay
-                </div>
+                <div className={styles.xof}>Réglé via Genius Pay</div>
 
                 <button
                   type="submit"

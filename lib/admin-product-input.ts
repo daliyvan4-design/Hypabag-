@@ -22,7 +22,7 @@ export function parseProductInput(body: unknown): ParsedInput {
   if (!nom || nom.length > 80) return { ok: false, error: "nom_requis" };
   if (!matiere || matiere.length > 120) return { ok: false, error: "matiere_requise" };
   if (!phrase || phrase.length > 200) return { ok: false, error: "phrase_requise" };
-  if (!Number.isFinite(prix) || prix < 0 || prix > 1_000_000) {
+  if (!Number.isFinite(prix) || prix < 0 || prix > 100_000_000) {
     return { ok: false, error: "prix_invalide" };
   }
   if (!Number.isFinite(largeur) || largeur < 15 || largeur > 100) {

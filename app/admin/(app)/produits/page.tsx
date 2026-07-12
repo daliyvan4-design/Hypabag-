@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { getProducts } from "@/lib/products";
 import styles from "./produits.module.css";
 import admin from "../../admin.module.css";
@@ -55,7 +55,7 @@ export default async function AdminProducts() {
                   </td>
                   <td>{product.matiere}</td>
                   <td className={`${admin.right} ${admin.mono}`}>
-                    {formatEuro(product.prix)}
+                    {formatXof(product.prix)}
                   </td>
                   <td className={admin.right}>
                     <span

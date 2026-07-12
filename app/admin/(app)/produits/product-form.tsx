@@ -133,14 +133,14 @@ export function ProductForm({ product }: { product?: Piece }) {
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="prix">
-            Prix (€)
+            Prix (FCFA)
           </label>
           <input
             id="prix"
             name="prix"
             type="number"
             min={0}
-            step={10}
+            step={5000}
             required
             defaultValue={product?.prix}
             className={styles.input}

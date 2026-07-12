@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import type { OrderRecord } from "@/lib/orders";
 import styles from "./dashboard.module.css";
 import admin from "../admin.module.css";
@@ -72,7 +72,7 @@ export function Dashboard({
         </div>
         <div className={admin.stat}>
           <div className={admin.statLabel}>Chiffre d&apos;affaires</div>
-          <div className={admin.statValue}>{formatEuro(view.revenue)}</div>
+          <div className={admin.statValue}>{formatXof(view.revenue)}</div>
           <div className={admin.statHint}>commandes enregistrées</div>
         </div>
         <div className={admin.stat}>
@@ -116,7 +116,7 @@ export function Dashboard({
                 <div
                   className={bucket.total > 0 ? styles.barFill : styles.barFillEmpty}
                   style={{ height: `${(bucket.total / view.peak) * 100}%` }}
-                  title={`${bucket.label} · ${formatEuro(bucket.total)}`}
+                  title={`${bucket.label} · ${formatXof(bucket.total)}`}
                 />
                 <span className={styles.barLabel}>{bucket.label}</span>
               </div>

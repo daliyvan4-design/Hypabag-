@@ -6,7 +6,7 @@ import {
   send,
   type OrderLine,
 } from "@/lib/email";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { verifyWebhook } from "@/lib/genius-pay";
 import { getOrder, updateOrder } from "@/lib/orders";
 import { releaseStock } from "@/lib/products";
@@ -69,9 +69,9 @@ async function fulfill(orderNo: string): Promise<void> {
   const emailLines: OrderLine[] = order.lines.map((l) => ({
     nom: l.nom,
     qte: l.qte,
-    total: formatEuro(l.prix * l.qte),
+    total: formatXof(l.prix * l.qte),
   }));
-  const total = formatEuro(order.total);
+  const total = formatXof(order.total);
 
   await send(config, {
     to: config.shop,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Striped } from "@/components/striped";
 import ui from "@/components/ui.module.css";
 import { useCart } from "@/lib/cart";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import styles from "./panier.module.css";
 
 export default function Panier() {
@@ -68,7 +68,7 @@ export default function Panier() {
                       </button>
                     </div>
                     <div className={styles.lineTotal}>
-                      {formatEuro(line.prix * line.qte)}
+                      {formatXof(line.prix * line.qte)}
                     </div>
                   </div>
                 ))}
@@ -77,7 +77,7 @@ export default function Panier() {
               <div className={styles.summary}>
                 <div className={ui.summaryRow}>
                   <span>Sous-total</span>
-                  <span>{formatEuro(subtotal)}</span>
+                  <span>{formatXof(subtotal)}</span>
                 </div>
                 <div className={ui.summaryRow}>
                   <span>Livraison</span>
@@ -85,7 +85,7 @@ export default function Panier() {
                 </div>
                 <div className={ui.summaryTotal}>
                   <span>Total</span>
-                  <span>{formatEuro(subtotal)}</span>
+                  <span>{formatXof(subtotal)}</span>
                 </div>
               </div>
 

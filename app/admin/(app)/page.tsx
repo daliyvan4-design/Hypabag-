@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { emailConfig } from "@/lib/email";
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { getOrders } from "@/lib/orders";
 import { getProducts } from "@/lib/products";
 import { getSubscribers } from "@/lib/subscribers";
@@ -83,7 +83,7 @@ export default async function AdminDashboard() {
                       {order.lines.reduce((sum, l) => sum + l.qte, 0) > 1 ? "s" : ""}
                     </td>
                     <td className={`${styles.right} ${styles.mono}`}>
-                      {formatEuro(order.total)}
+                      {formatXof(order.total)}
                     </td>
                     <td>
                       <span className={order.emailed ? styles.tag : styles.tagMuted}>

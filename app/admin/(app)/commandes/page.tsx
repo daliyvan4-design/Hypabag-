@@ -1,4 +1,4 @@
-import { formatEuro } from "@/lib/format";
+import { formatXof } from "@/lib/format";
 import { getOrders } from "@/lib/orders";
 import { getSubscribers } from "@/lib/subscribers";
 import { OrderControls } from "./order-controls";
@@ -74,7 +74,7 @@ export default async function AdminOrders() {
                       ))}
                     </td>
                     <td className={`${admin.right} ${admin.mono}`}>
-                      {formatEuro(order.total)}
+                      {formatXof(order.total)}
                     </td>
                     <td>
                       <span className={order.emailed ? admin.tag : admin.tagMuted}>
