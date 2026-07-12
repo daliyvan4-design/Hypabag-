@@ -69,18 +69,23 @@ export async function createPayment(
     .json()
     .catch(() => ({}));
 
+  // The API wraps the payload in { success, data: { … } }; older/sandbox
+  // shapes may be flat, so fall back to the top level.
+  const data = ((body.data as Record<string, unknown>) ?? body) ?? {};
+
   if (!response.ok) {
     const detail =
       (body.message as string | undefined) ??
+      (data.message as string | undefined) ??
       (body.error as string | undefined) ??
       `HTTP ${response.status}`;
     return { ok: false, error: detail };
   }
 
-  const checkoutUrl = (body.checkout_url ?? body.payment_url) as
+  const checkoutUrl = (data.checkout_url ?? data.payment_url) as
     | string
     | undefined;
-  const reference = body.reference as string | undefined;
+  const reference = data.reference as string | undefined;
   if (!checkoutUrl || !reference) {
     return { ok: false, error: "genius_pay_bad_response" };
   }
