@@ -41,6 +41,26 @@ cookie HttpOnly. Quatre espaces :
 - **Commandes** — historique, inscrits, et **suivi** : statut (en préparation /
   expédiée / livrée / annulée) et numéro de suivi par commande.
 
+## Paiement (Genius Pay)
+
+Passerelle ivoirienne [pay.genius.ci](https://pay.genius.ci/doc), débit en XOF.
+
+- Au checkout, le serveur ([app/api/checkout](app/api/checkout/route.ts)) réserve
+  le stock, enregistre une commande « en attente de paiement », crée la
+  transaction Genius Pay et renvoie le `checkout_url` ; le client est redirigé
+  vers la page de paiement hébergée (Wave, Orange Money, MTN, carte).
+- Le montant est converti EUR→XOF au **taux fixe légal du franc CFA** (1 € =
+  655,957 FCFA, voir [lib/format.ts](lib/format.ts)). Le catalogue reste en euros.
+- Le **webhook** ([app/api/webhooks/genius-pay](app/api/webhooks/genius-pay/route.ts))
+  est la source de vérité : signature HMAC-SHA256 vérifiée (fenêtre anti-rejeu
+  5 min), puis la commande est validée (payée → en préparation, emails envoyés)
+  de façon idempotente, ou le stock est relâché en cas d'échec.
+- Variables : `GENIUS_PAY_API_KEY`, `GENIUS_PAY_API_SECRET`,
+  `GENIUS_PAY_WEBHOOK_SECRET` (optionnel, défaut = API secret), `GENIUS_PAY_BASE`
+  (optionnel), `NEXT_PUBLIC_SITE_URL`.
+- **URL de webhook à enregistrer** dans le dashboard Genius Pay :
+  `https://hypa-one.vercel.app/api/webhooks/genius-pay`.
+
 ## Stock & suivi de commande
 
 - Chaque pièce a un `stock`. `/api/orders` réserve le stock de façon atomique
@@ -137,9 +157,6 @@ place dans un site réel :
 - **Vidéo héros** (fond d'accueil) : optionnelle, à téléverser via **/admin →
   Média & vidéos** si souhaité ; sans elle, le héros garde son image d'affiche.
   Toute vidéo téléversée depuis le backoffice remplace le défaut.
-- **Le paiement n'est pas encaissé.** `/api/orders` enregistre la commande et
-  envoie les emails, mais aucun processeur (Stripe…) n'est branché : les champs
-  de carte ne sont lus par personne. À câbler avant toute vente réelle.
 - **Domaine email à vérifier.** Tant que `RESEND_FROM` reste le bac à sable, les
   clients ne reçoivent pas leur confirmation (seul `RESEND_SHOP_EMAIL` est
   servi). Acheter + vérifier un domaine chez Resend, puis changer `RESEND_FROM`.
