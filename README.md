@@ -30,16 +30,30 @@ Basculer sur `bonjour@votredomaine.fr` une fois le domaine vérifié.
 ## Backoffice (`/admin`)
 
 Espace de gestion protégé par mot de passe (`ADMIN_PASSWORD`), session signée en
-cookie HttpOnly. Trois espaces :
+cookie HttpOnly. Quatre espaces :
 
 - **Tableau de bord** — CA, commandes, inscrits, pièces ; graphique du CA par
   jour avec sélecteur de période (7 j / 30 j / tout).
-- **Produits** — création, édition, suppression des pièces (avec upload de photo
-  vers Cloudinary). Toute modification se reflète immédiatement sur le site.
-- **Média & vidéos** — upload des vidéos héros et de transition vers Cloudinary,
-  actives sur le site dès l'envoi ; « Retirer » revient au fallback (image
-  d'affiche / monogramme).
-- **Commandes** — historique complet des commandes et des inscrits.
+- **Produits** — création, édition, suppression des pièces (photo Cloudinary,
+  **stock**). Toute modification se reflète immédiatement sur le site ; à 0 la
+  pièce passe « Épuisé » et n'est plus commandable.
+- **Média & vidéos** — upload des vidéos héros et de transition vers Cloudinary.
+- **Commandes** — historique, inscrits, et **suivi** : statut (en préparation /
+  expédiée / livrée / annulée) et numéro de suivi par commande.
+
+## Stock & suivi de commande
+
+- Chaque pièce a un `stock`. `/api/orders` réserve le stock de façon atomique
+  (verrou de ligne) avant de confirmer ; une pièce épuisée renvoie 409.
+- Les clients suivent leur commande sur **/suivi** (numéro + email, l'email doit
+  correspondre pour éviter l'énumération). Le lien est aussi dans l'email de
+  confirmation.
+- Les emails (commande, alerte atelier, bienvenue, inscription) sont des
+  gabarits HTML de marque dans [lib/email.ts](lib/email.ts).
+- Un **pop-up newsletter** s'affiche sur l'accueil au bout de 10 s, deux fois au
+  plus (compteur `localStorage`), jamais après inscription.
+- Le **garde-fou anti-abus** ([lib/rate-limit.ts](lib/rate-limit.ts)) est
+  adossé à Postgres (partagé entre instances) ; repli mémoire en local.
 
 ## Persistance
 
@@ -129,9 +143,8 @@ place dans un site réel :
 - **Domaine email à vérifier.** Tant que `RESEND_FROM` reste le bac à sable, les
   clients ne reçoivent pas leur confirmation (seul `RESEND_SHOP_EMAIL` est
   servi). Acheter + vérifier un domaine chez Resend, puis changer `RESEND_FROM`.
-- **Faire tourner les secrets** ayant transité par la mise en place
-  (clés Cloudinary et Resend).
 - **Six pièces sur sept n'ont pas de spécifications.** Elles ont désormais leur
   prose descriptive, mais dimensions / matières / délais restent vides : ce sont
   des affirmations commerciales, à remplir dans `lib/pieces.ts` par l'atelier.
 - **Les bandes rayées** tiennent lieu de photographies produit.
+- **Pages légales** (CGV, mentions légales, RGPD, livraison, retours) à écrire.
