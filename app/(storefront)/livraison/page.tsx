@@ -18,27 +18,26 @@ export default function Livraison() {
       <h2>Zones et délais</h2>
       <ul>
         <li>
-          <strong>Abidjan</strong> — <Fill>[délai, ex. 2 à 3 jours ouvrés]</Fill>
+          <strong>Abidjan</strong> — 2 à 3 jours ouvrés
         </li>
         <li>
-          <strong>Reste de la Côte d&apos;Ivoire</strong> —{" "}
-          <Fill>[délai]</Fill>
+          <strong>Reste de la Côte d&apos;Ivoire</strong> — 3 à 5 jours ouvrés
         </li>
         <li>
-          <strong>International</strong> — <Fill>[délai / zones desservies]</Fill>
+          <strong>International</strong> — 7 à 14 jours ouvrés
         </li>
       </ul>
       <p>
         Les délais courent à compter de la confirmation du paiement. Ils sont
         donnés à titre indicatif et peuvent varier selon la pièce et la
-        destination.
+        destination. <Fill>[Ajustez ces délais et zones selon votre logistique.]</Fill>
       </p>
 
       <h2>Frais de livraison</h2>
       <p>
         La livraison est <strong>offerte</strong>, sous écrin HYPA. Toute
         évolution de cette politique sera indiquée avant la validation du
-        paiement. <Fill>[Précisez ici d&apos;éventuels frais par zone.]</Fill>
+        paiement.
       </p>
 
       <h2>Suivi</h2>

@@ -98,10 +98,10 @@ export default function CGV() {
 
       <h2>10. Droit applicable et litiges</h2>
       <p>
-        Les présentes conditions sont soumises au droit{" "}
-        <Fill>[droit applicable — ex. ivoirien]</Fill>. En cas de litige, une
-        solution amiable sera recherchée avant toute action ; à défaut, les
-        tribunaux compétents seront ceux de <Fill>[ressort compétent]</Fill>.
+        Les présentes conditions sont soumises au droit ivoirien. En cas de
+        litige, une solution amiable sera recherchée avant toute action ; à
+        défaut, compétence est attribuée aux tribunaux d&apos;Abidjan.{" "}
+        <Fill>[À adapter si la Maison relève d&apos;une autre juridiction.]</Fill>
       </p>
     </LegalPage>
   );

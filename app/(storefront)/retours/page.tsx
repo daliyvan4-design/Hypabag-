@@ -42,16 +42,17 @@ export default function Retours() {
       <p>
         Écrivez à <Fill>[email de contact]</Fill> en indiquant votre numéro de
         commande. Nous vous communiquerons l&apos;adresse et les modalités de
-        retour. <Fill>[Précisez ici qui prend en charge les frais de retour.]</Fill>
+        retour. Les frais de retour sont à la charge du Client, sauf en cas
+        d&apos;erreur ou de défaut de notre part.{" "}
+        <Fill>[À adapter selon votre politique.]</Fill>
       </p>
 
       <h2>Remboursement</h2>
       <p>
         Après réception et vérification de la pièce, le remboursement est
-        effectué sous <Fill>[délai, ex. 14 jours]</Fill>, par le même moyen de
-        paiement que celui utilisé lors de l&apos;achat. Les frais de livraison
-        initiaux, lorsqu&apos;ils existent, sont{" "}
-        <Fill>[remboursés / non remboursés]</Fill>.
+        effectué sous quatorze (14) jours, par le même moyen de paiement que
+        celui utilisé lors de l&apos;achat. Les frais de livraison initiaux,
+        lorsqu&apos;ils existent, sont remboursés.
       </p>
 
       <h2>Échange</h2>

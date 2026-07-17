@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { siteUrl } from "@/lib/email";
+import { expireStalePendingOrders } from "@/lib/expire";
 import { createPayment, geniusPayConfigured } from "@/lib/genius-pay";
 import { recordPendingOrder, updateOrder } from "@/lib/orders";
 import { getProduct, releaseStock, reserveStock } from "@/lib/products";
@@ -58,6 +59,12 @@ export async function POST(request: Request) {
   if (!order) {
     return NextResponse.json({ error: "invalid_order" }, { status: 400 });
   }
+
+  // Free stock held by abandoned checkouts before reserving, so a buyer never
+  // sees a piece stuck "épuisé" by someone else's unfinished payment.
+  await expireStalePendingOrders().catch((error) =>
+    console.error("checkout: expiry sweep failed —", error),
+  );
 
   // Prices from the catalogue, never the request body.
   let subtotal = 0;

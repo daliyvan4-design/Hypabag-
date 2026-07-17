@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { siteOrigin } from "@/lib/site";
 import "./globals.css";
+
+const DESCRIPTION =
+  "Des pièces tissées à la main à partir d'un unique cordon de coton tressé. Aucune machine. Aucune série. Une galerie, plutôt qu'une boutique.";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -20,12 +24,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteOrigin()),
   title: {
     default: "HYPA · Maroquinerie artisanale",
     template: "%s · HYPA",
   },
-  description:
-    "Des pièces tissées à la main à partir d'un unique cordon de coton tressé. Aucune machine. Aucune série. Une galerie, plutôt qu'une boutique.",
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: "HYPA",
+    locale: "fr_FR",
+    title: "HYPA · Maroquinerie artisanale",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HYPA · Maroquinerie artisanale",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
