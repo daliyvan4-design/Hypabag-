@@ -9,7 +9,7 @@ import { LOGO_MARK } from "@/lib/media";
 import styles from "./nav.module.css";
 
 const LINKS = [
-  { href: "/", label: "Accueil" },
+  { href: "/a-propos", label: "À propos" },
   { href: "/collection", label: "Collection" },
   { href: "/atelier", label: "Atelier" },
 ];

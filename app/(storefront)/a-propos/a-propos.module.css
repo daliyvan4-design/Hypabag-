@@ -1,0 +1,189 @@
+.head {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 110px var(--gutter) 40px;
+}
+
+.title {
+  font-family: var(--font-serif), serif;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--bordeaux);
+}
+
+.lead {
+  font-size: 17px;
+  line-height: 1.8;
+  font-weight: 300;
+  opacity: 0.75;
+  margin-top: 26px;
+  max-width: 620px;
+}
+
+/* Manifesto + image ------------------------------------------------------- */
+
+.split {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 60px var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.para {
+  font-size: 15px;
+  line-height: 1.9;
+  font-weight: 300;
+  opacity: 0.82;
+  margin: 0 0 18px;
+}
+
+.figure {
+  margin: 0;
+}
+
+.figure .frame {
+  background: var(--ivoire);
+  padding: 16px;
+  border: 1px solid rgba(42, 35, 32, 0.14);
+  box-shadow: 0 24px 50px rgba(42, 35, 32, 0.14);
+  aspect-ratio: 1 / 1.04;
+  overflow: hidden;
+}
+
+.figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cartel {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+  margin-top: 14px;
+  font-weight: 300;
+}
+
+/* Quote band -------------------------------------------------------------- */
+
+.quote {
+  background: var(--bordeaux);
+  padding: 100px var(--gutter);
+  text-align: center;
+}
+
+.quoteText {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 40px;
+  color: var(--ecru);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.quoteAttrib {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--rose);
+  opacity: 0.9;
+  margin-top: 20px;
+}
+
+/* Principles -------------------------------------------------------------- */
+
+.principles {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 110px var(--gutter);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 44px;
+  margin-top: 44px;
+}
+
+.principle .num {
+  font-family: var(--font-serif), serif;
+  font-size: 26px;
+  color: var(--bordeaux);
+  opacity: 0.8;
+}
+
+.principle .name {
+  font-family: var(--font-serif), serif;
+  font-size: 22px;
+  margin: 14px 0 8px;
+}
+
+.principle .text {
+  font-size: 13.5px;
+  line-height: 1.7;
+  font-weight: 300;
+  opacity: 0.6;
+}
+
+/* Closing ----------------------------------------------------------------- */
+
+.closing {
+  background: var(--creme);
+  text-align: center;
+  padding: 100px var(--gutter);
+}
+
+.closingTitle {
+  font-family: var(--font-serif), serif;
+  font-weight: 400;
+  font-size: 38px;
+  color: var(--bordeaux);
+  margin: 0 0 28px;
+}
+
+@media (max-width: 860px) {
+  .head {
+    padding: 80px var(--gutter) 24px;
+  }
+  .title {
+    font-size: 38px;
+  }
+  .lead {
+    font-size: 15px;
+  }
+  .split {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    padding: 40px var(--gutter);
+  }
+  .quote {
+    padding: 70px var(--gutter);
+  }
+  .quoteText {
+    font-size: 26px;
+  }
+  .principles {
+    padding: 70px var(--gutter);
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .closing {
+    padding: 70px var(--gutter);
+  }
+  .closingTitle {
+    font-size: 28px;
+  }
+}

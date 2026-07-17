@@ -94,8 +94,8 @@ export function Footer() {
         <div className={styles.columns}>
           <div>
             <div className={styles.columnTitle}>Maison</div>
-            <Link href="/" className={styles.link}>
-              Accueil
+            <Link href="/a-propos" className={styles.link}>
+              À propos
             </Link>
             <Link href="/atelier" className={styles.link}>
               L&apos;Atelier
